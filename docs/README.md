@@ -5,6 +5,7 @@ This directory contains higher-level documentation for the **Mobile AI Cartoon G
 ## Contents
 
 - `architecture.md` – Detailed architecture overview and component interactions.
+- `model_pipeline.md` – Model download, inference, conversion/quantization, and benchmarking pipeline.
 
 Additional documents that may be added later:
 

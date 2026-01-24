@@ -9,13 +9,17 @@ This document outlines the initial testing strategy for the Mobile AI Cartoon Ge
 - Maintain **compatibility** with free-tier infrastructure and local dev environments.
 - Keep the test tooling **simple and standard** (pytest, Streamlit/Gradio smoke tests).
 
-## Scope (v0.0.0)
+## Scope (v0.0.0–v0.1.0)
 
-At the scaffold stage, tests focus on:
+At the scaffold stage and the initial model POC, tests focus on:
 
 - The **FastAPI backend**:
   - Health endpoint correctness.
   - Application creation and logging configuration.
+- The **cartoonizer model package**:
+  - CLI parsing and basic behavior.
+  - Preprocessing and postprocessing correctness on synthetic data.
+  - Registry structure and invariants.
 - **Repository structure and formatting**:
   - CI workflows run linters and basic checks.
 
@@ -32,14 +36,20 @@ Smoke tests for these components are manual for now.
 ### 1. Unit tests (Python)
 
 - **Framework**: `pytest`
-- **Location**: `api_web/backend/tests/`
+- **Locations**:
+  - `api_web/backend/tests/`
+  - `models/cartoonizer/tests/`
 - **Initial coverage**:
   - `/health` endpoint returns HTTP 200.
   - Response schema contains expected fields.
+  - Cartoonizer preprocessing/postprocessing round-trip behavior on synthetic images.
+  - Cartoonizer CLI smoke tests (e.g. `python -m cartoonizer --help`).
+  - Registry format and required fields for registered models.
 - **Future coverage** (planned):
   - Cartoonization request handlers (once implemented).
   - Error handling utilities and edge cases.
   - Configuration handling and environment-based behavior.
+  - End-to-end tests for the cartoonizer inference and conversion pipelines.
 
 ### 2. Integration tests (future)
 
@@ -72,11 +82,13 @@ Automated UI testing may be considered later but is not required initially.
 
 - Runs on pushes and pull requests.
 - Steps:
-  - Install Python and dependencies for `api_web/backend`.
+  - Install Python and dependencies for:
+    - `api_web/backend`
+    - `models/cartoonizer`
   - Run:
-    - `ruff` on backend code.
-    - `black --check` on backend code.
+    - `ruff` + `black --check` on backend and cartoonizer code.
     - `pytest` on backend tests.
+    - `pytest` on cartoonizer tests (which are designed to avoid model downloads and heavy optional deps).
 
 ### repo-lint workflow
 
@@ -84,12 +96,19 @@ Automated UI testing may be considered later but is not required initially.
   - Format validation (ruff/black or pre-commit).
   - Basic structure checks (presence of key files/directories).
 
+### CI and models
+
+- CI **does not** download real models or run conversion/benchmark commands by default.
+- Cartoonizer tests and linters only rely on lightweight dependencies and synthetic data.
+- Developers can run full pipelines (download, infer, benchmark, convert) locally as needed.
+
 ## Test data
 
 - Prefer **synthetic** and **small** test data:
   - Small example images stored outside the repo if possible (or generated on the fly).
   - No personal or sensitive user data.
-- For now, backend tests use basic JSON payloads and require no image files.
+- Backend tests use basic JSON payloads and require no image files.
+- Cartoonizer tests use small synthetic arrays and do not download real models.
 
 ## Quality thresholds
 

@@ -107,3 +107,61 @@ Format guideline:
   - Encourages sustainable, open development.
   - Aligns with the core philosophy of the project.
 - **Status**: Accepted
+
+## DEC-0009 – TF Hub TFLite download convention
+
+- **Date**: 2026-01-24
+- **Context**: We need a reproducible way to obtain ready-to-use TFLite cartoonization models.
+- **Decision**: Use TensorFlow Hub TFLite downloads by appending `?lite-format=tflite` to TF Hub model URLs, following the official convention.
+- **Rationale**:
+  - Aligns with TF Hub’s documented approach for TFLite artifacts.
+  - Simplifies scripting and automation of model downloads.
+  - Keeps the pipeline compatible with any future TF Hub cartoonization models.
+- **Status**: Accepted
+
+## DEC-0010 – Gitignored artifacts directory for models
+
+- **Date**: 2026-01-24
+- **Context**: Model binaries are large and should not be committed to git.
+- **Decision**: Store all downloaded, converted, and benchmark-related artifacts under `models/artifacts/`, and gitignore that directory.
+- **Rationale**:
+  - Keeps the repository light and avoids accidentally committing large binaries.
+  - Makes it clear where artifacts should be written and discovered.
+  - Supports reproducibility: artifacts can be regenerated from code and configuration.
+- **Status**: Accepted
+
+## DEC-0011 – TFLite runtime with TensorFlow fallback
+
+- **Date**: 2026-01-24
+- **Context**: We need a CPU-only inference pipeline that works on a wide range of systems.
+- **Decision**: Use `tflite-runtime` as the preferred interpreter for TFLite models, with a fallback to TensorFlow’s TFLite interpreter if `tflite-runtime` is unavailable.
+- **Rationale**:
+  - `tflite-runtime` is lightweight and well-suited for CPU inference.
+  - TensorFlow provides a portable fallback for environments where `tflite-runtime` is not available.
+  - The code detects missing interpreters and emits clear, user-friendly errors.
+- **Status**: Accepted
+
+## DEC-0012 – Quantization variants: fp32 baseline, fp16, int8
+
+- **Date**: 2026-01-24
+- **Context**: We want a conversion pipeline that explores standard post-training quantization trade-offs.
+- **Decision**: Support three variants for SavedModel → TFLite conversion:
+  - `fp32` baseline (no quantization),
+  - `fp16` post-training quantization,
+  - `int8` with dynamic range quantization by default and full integer quantization when a representative dataset is provided.
+- **Rationale**:
+  - Mirrors official TensorFlow Lite post-training quantization patterns.
+  - Provides a clear comparison across quality, size, and latency.
+  - Covers typical deployment targets from desktop to low-end mobile devices.
+- **Status**: Accepted
+
+## DEC-0013 – Avoid AnimeGANv2 for default / commercial use
+
+- **Date**: 2026-01-24
+- **Context**: Some popular cartoonization models (e.g. AnimeGANv2) have licenses that can be restrictive for commercial use.
+- **Decision**: Avoid AnimeGANv2 and similarly restrictive models as default choices in this project. They may be considered as optional, explicitly documented cloud models later, but are not part of the core free-first pipeline.
+- **Rationale**:
+  - Reduces legal ambiguity for users who may want to use this project commercially.
+  - Encourages the use of models with clearer, more permissive licensing.
+  - Keeps the default pipelines aligned with the free-first and open ethos of the project.
+- **Status**: Accepted
