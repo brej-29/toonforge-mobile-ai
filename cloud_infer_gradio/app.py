@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 try:
     import spaces  # type: ignore[import]
 except ImportError:  # pragma: no cover
+
     class _DummySpaces:
         @staticmethod
         def GPU(*_args, **_kwargs):

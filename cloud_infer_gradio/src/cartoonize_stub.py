@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import time
-from io import BytesIO
 from pathlib import Path
 from typing import Dict, Tuple
 
@@ -60,7 +59,9 @@ def _ensure_model_path(model_variant: str) -> Path:
     return model_path
 
 
-def cartoonize_with_tflite(image: Image.Image, model_variant: str) -> Tuple[Image.Image, Dict[str, float]]:
+def cartoonize_with_tflite(
+    image: Image.Image, model_variant: str
+) -> Tuple[Image.Image, Dict[str, float]]:
     """Run cartoonization using the shared TFLite pipeline from the cartoonizer package."""
     try:
         from cartoonizer.constants import MODEL_PROFILE_DEFAULT  # type: ignore[import]

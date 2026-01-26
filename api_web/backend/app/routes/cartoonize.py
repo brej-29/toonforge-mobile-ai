@@ -56,9 +56,7 @@ async def cartoonize(
     )
 
     if mode == "local":
-        png_bytes, metrics = cartoonize_local.run_cartoonize_local(
-            body, model_variant
-        )
+        png_bytes, metrics = cartoonize_local.run_cartoonize_local(body, model_variant)
     else:
         png_bytes, metrics = cartoonize_cloud.run_cartoonize_cloud(
             body, model_variant, ip_token=x_ip_token

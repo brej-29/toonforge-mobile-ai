@@ -74,7 +74,9 @@ def main() -> None:
 
     st.sidebar.header("Backend configuration")
     api_base = get_api_base_url()
-    st.sidebar.text_input("API base URL", value=api_base, key="api_base_url", disabled=True)
+    st.sidebar.text_input(
+        "API base URL", value=api_base, key="api_base_url", disabled=True
+    )
     st.sidebar.caption(
         "Override via the API_BASE_URL environment variable when launching Streamlit."
     )
