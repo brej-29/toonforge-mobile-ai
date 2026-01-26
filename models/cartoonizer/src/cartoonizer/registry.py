@@ -41,4 +41,6 @@ def get_model(model_id: str) -> RegistryEntry:
     try:
         return REGISTERED_MODELS[model_id]
     except KeyError as exc:  # noqa: PERF203
-        raise KeyError(f"Unknown model_id: {model_id}. Known IDs: {list(REGISTERED_MODELS.keys())}") from exc
+        raise KeyError(
+            f"Unknown model_id: {model_id}. Known IDs: {list(REGISTERED_MODELS.keys())}"
+        ) from exc

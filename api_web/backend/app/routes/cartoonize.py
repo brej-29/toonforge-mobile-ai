@@ -59,7 +59,9 @@ async def cartoonize(
     if mode == "local":
         png_bytes, metrics = run_cartoonize_local(body, model_variant)
     else:
-        png_bytes, metrics = run_cartoonize_cloud(body, model_variant, ip_token=x_ip_token)
+        png_bytes, metrics = run_cartoonize_cloud(
+            body, model_variant, ip_token=x_ip_token
+        )
 
     headers: Dict[str, str] = {
         "x-latency-total-ms": f"{metrics.get('total_ms', 0.0):.2f}",

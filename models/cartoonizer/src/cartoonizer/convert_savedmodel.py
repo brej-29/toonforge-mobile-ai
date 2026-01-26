@@ -60,7 +60,9 @@ def _resolve_savedmodel_source(source: str) -> Path:
 
     # Treat as Hugging Face model ID
     snapshot_download = _import_hf_hub()
-    logger.info("Downloading SavedModel from Hugging Face Hub", extra={"model_id": source})
+    logger.info(
+        "Downloading SavedModel from Hugging Face Hub", extra={"model_id": source}
+    )
     repo_dir = Path(snapshot_download(repo_id=source))
     # Heuristic: SavedModel directory named "saved_model" or "saved_model.pb" present.
     for candidate in [repo_dir, repo_dir / "saved_model"]:
@@ -98,7 +100,11 @@ def convert_savedmodel_variants(
     out_dir.mkdir(parents=True, exist_ok=True)
     logger.info(
         "Converting SavedModel to TFLite variants",
-        extra={"savedmodel_dir": str(savedmodel_dir), "out_dir": str(out_dir), "variants": ",".join(variants)},
+        extra={
+            "savedmodel_dir": str(savedmodel_dir),
+            "out_dir": str(out_dir),
+            "variants": ",".join(variants),
+        },
     )
 
     for variant in variants:
@@ -120,10 +126,14 @@ def convert_savedmodel_variants(
             options = {
                 "optimization": "Optimize.DEFAULT",
                 "inference_type": "int8",
-                "representative_data_dir": str(representative_data_dir) if representative_data_dir else "",
+                "representative_data_dir": (
+                    str(representative_data_dir) if representative_data_dir else ""
+                ),
             }
         else:
-            raise ValueError(f"Unknown variant: {variant}. Expected one of: fp32, fp16, int8.")
+            raise ValueError(
+                f"Unknown variant: {variant}. Expected one of: fp32, fp16, int8."
+            )
 
         model_info = _inspect_tflite_model(output_path)
         size_bytes = output_path.stat().st_size
@@ -149,7 +159,11 @@ def cli(args) -> int:
     savedmodel_source = args.savedmodel
     out_dir = Path(args.out_dir).expanduser().resolve()
     variants = [v.strip() for v in args.variants.split(",") if v.strip()]
-    representative_data_dir = Path(args.representative_data_dir).expanduser() if args.representative_data_dir else None
+    representative_data_dir = (
+        Path(args.representative_data_dir).expanduser()
+        if args.representative_data_dir
+        else None
+    )
 
     try:
         convert_savedmodel_variants(

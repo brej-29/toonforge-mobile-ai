@@ -89,4 +89,6 @@ def preprocess_image(
     tensor = np.expand_dims(img_float, axis=0)  # (1, H, W, 3)
 
     elapsed_ms = (time.perf_counter() - start) * 1000.0
-    return PreprocessResult(tensor=tensor, new_size=(target_h, target_w), elapsed_ms=elapsed_ms)
+    return PreprocessResult(
+        tensor=tensor, new_size=(target_h, target_w), elapsed_ms=elapsed_ms
+    )

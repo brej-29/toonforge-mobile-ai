@@ -45,7 +45,9 @@ def version() -> VersionResponse:
 def list_models() -> ModelsResponse:
     """List supported cartoonization modes and model variants."""
     modes = [
-        ModelMode(id="local", description="Local CPU TFLite inference using cached models."),
+        ModelMode(
+            id="local", description="Local CPU TFLite inference using cached models."
+        ),
         ModelMode(
             id="cloud",
             description="Cloud inference via Gradio Space using gradio_client (ZeroGPU optional).",
@@ -53,6 +55,8 @@ def list_models() -> ModelsResponse:
     ]
     variants = [
         ModelVariant(id="fp16", description="Float16-optimized TFLite model."),
-        ModelVariant(id="int8", description="Int8-quantized TFLite model (smaller, faster)."),
+        ModelVariant(
+            id="int8", description="Int8-quantized TFLite model (smaller, faster)."
+        ),
     ]
     return ModelsResponse(modes=modes, variants=variants)

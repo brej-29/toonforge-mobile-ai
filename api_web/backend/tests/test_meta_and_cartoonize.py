@@ -35,14 +35,20 @@ def test_cartoonize_rejects_invalid_mode(monkeypatch) -> None:
     def _fake_local(_: bytes, __: str) -> Tuple[bytes, Dict[str, float]]:
         return b"", {"total_ms": 0.0}
 
-    def _fake_cloud(_: bytes, __: str, ___: str | None) -> Tuple[bytes, Dict[str, float]]:
+    def _fake_cloud(
+        _: bytes, __: str, ___: str | None
+    ) -> Tuple[bytes, Dict[str, float]]:
         return b"", {"total_ms": 0.0}
 
     monkeypatch.setattr(cartoonize_local, "run_cartoonize_local", _fake_local)
     monkeypatch.setattr(cartoonize_cloud, "run_cartoonize_cloud", _fake_cloud)
 
     files = {"image": ("test.png", b"fake", "image/png")}
-    data: Dict[str, Any] = {"mode": "unsupported", "model_variant": "fp16", "output": "png"}
+    data: Dict[str, Any] = {
+        "mode": "unsupported",
+        "model_variant": "fp16",
+        "output": "png",
+    }
     response = client.post("/v1/cartoonize", data=data, files=files)
     # FastAPI will coerce invalid literal to 422 Unprocessable Entity
     assert response.status_code == 422
@@ -54,7 +60,9 @@ def test_cartoonize_local_happy_path(monkeypatch) -> None:
     def _fake_local(_: bytes, __: str) -> Tuple[bytes, Dict[str, float]]:
         return b"pngbytes", {"total_ms": 12.3, "inference_ms": 7.8}
 
-    def _fake_cloud(_: bytes, __: str, ___: str | None) -> Tuple[bytes, Dict[str, float]]:
+    def _fake_cloud(
+        _: bytes, __: str, ___: str | None
+    ) -> Tuple[bytes, Dict[str, float]]:
         raise AssertionError("Cloud runner should not be called in this test")
 
     monkeypatch.setattr(cartoonize_local, "run_cartoonize_local", _fake_local)

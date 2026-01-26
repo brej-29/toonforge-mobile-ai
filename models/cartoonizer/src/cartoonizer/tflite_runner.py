@@ -96,7 +96,9 @@ class TFLiteRunner:
         if h <= 0 or w <= 0:
             return None
         if h != w:
-            logger.info("Non-square model input (%s), using height/width from model", shape)
+            logger.info(
+                "Non-square model input (%s), using height/width from model", shape
+            )
         if h > 0 and w > 0:
             return int(h), int(w)
         return None
@@ -107,7 +109,9 @@ class TFLiteRunner:
         Expects input_tensor shape compatible with the model (1, H, W, 3).
         """
         if input_tensor.ndim != 4:
-            raise ValueError(f"Expected input tensor with 4 dimensions, got {input_tensor.shape}")
+            raise ValueError(
+                f"Expected input tensor with 4 dimensions, got {input_tensor.shape}"
+            )
 
         input_index = self.input_details[0]["index"]
         self.interpreter.set_tensor(input_index, input_tensor)

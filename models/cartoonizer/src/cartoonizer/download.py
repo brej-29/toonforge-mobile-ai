@@ -35,7 +35,9 @@ def _download_file(url: str, dest: Path) -> int:
                     continue
                 f.write(chunk)
                 bytes_written += len(chunk)
-    logger.info("Download complete", extra={"destination": str(dest), "bytes": bytes_written})
+    logger.info(
+        "Download complete", extra={"destination": str(dest), "bytes": bytes_written}
+    )
     return bytes_written
 
 

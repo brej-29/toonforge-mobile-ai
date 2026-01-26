@@ -54,9 +54,15 @@ def build_parser() -> argparse.ArgumentParser:
         "infer",
         help="Run inference on a local image with a TFLite model.",
     )
-    infer_parser.add_argument("--model", type=str, required=True, help="Path to TFLite model.")
-    infer_parser.add_argument("--input", type=str, required=True, help="Path to input image.")
-    infer_parser.add_argument("--output", type=str, required=True, help="Path to output image.")
+    infer_parser.add_argument(
+        "--model", type=str, required=True, help="Path to TFLite model."
+    )
+    infer_parser.add_argument(
+        "--input", type=str, required=True, help="Path to input image."
+    )
+    infer_parser.add_argument(
+        "--output", type=str, required=True, help="Path to output image."
+    )
     infer_parser.add_argument(
         "--max_size",
         type=int,
@@ -83,8 +89,12 @@ def build_parser() -> argparse.ArgumentParser:
         "benchmark",
         help="Benchmark a TFLite model (latency, size).",
     )
-    benchmark_parser.add_argument("--model", type=str, required=True, help="Path to TFLite model.")
-    benchmark_parser.add_argument("--input", type=str, required=True, help="Path to input image.")
+    benchmark_parser.add_argument(
+        "--model", type=str, required=True, help="Path to TFLite model."
+    )
+    benchmark_parser.add_argument(
+        "--input", type=str, required=True, help="Path to input image."
+    )
     benchmark_parser.add_argument(
         "--runs",
         type=int,

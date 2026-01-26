@@ -70,7 +70,11 @@ def run_cartoonize_cloud(
             last_error = exc
             logger.warning(
                 "Cloud cartoonization attempt failed",
-                extra={"attempt": attempt + 1, "mode": "cloud", "variant": model_variant},
+                extra={
+                    "attempt": attempt + 1,
+                    "mode": "cloud",
+                    "variant": model_variant,
+                },
             )
 
     if last_error is not None or result_bytes is None:

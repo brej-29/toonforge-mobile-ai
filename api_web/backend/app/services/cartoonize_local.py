@@ -61,7 +61,9 @@ def _ensure_model_in_cache(model_id: str) -> Path:
     return model_path
 
 
-def run_cartoonize_local(image_bytes: bytes, model_variant: str) -> Tuple[bytes, Dict[str, float]]:
+def run_cartoonize_local(
+    image_bytes: bytes, model_variant: str
+) -> Tuple[bytes, Dict[str, float]]:
     """Run local CPU cartoonization using a cached TFLite model.
 
     Returns PNG bytes and latency metrics.

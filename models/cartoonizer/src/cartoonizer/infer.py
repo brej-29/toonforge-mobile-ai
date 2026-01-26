@@ -41,7 +41,10 @@ def run_inference(
     if expected_hw is not None:
         target_size: Tuple[int, int] = expected_hw
     else:
-        target_size = (MODEL_PROFILE_DEFAULT.input_size, MODEL_PROFILE_DEFAULT.input_size)
+        target_size = (
+            MODEL_PROFILE_DEFAULT.input_size,
+            MODEL_PROFILE_DEFAULT.input_size,
+        )
 
     preprocess_result = preprocess_image(
         image=image,

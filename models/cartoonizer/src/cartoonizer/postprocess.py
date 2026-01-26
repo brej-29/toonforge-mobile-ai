@@ -35,7 +35,9 @@ def postprocess_image(
     - Resize back to `target_size` if provided.
     """
     if output_tensor.ndim != 4 or output_tensor.shape[0] != 1:
-        raise ValueError(f"Expected output tensor with shape (1, H, W, 3), got {output_tensor.shape}")
+        raise ValueError(
+            f"Expected output tensor with shape (1, H, W, 3), got {output_tensor.shape}"
+        )
 
     start = time.perf_counter()
 

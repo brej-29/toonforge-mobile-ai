@@ -120,7 +120,9 @@ def cli(args) -> int:
     warmup = int(args.warmup)
 
     try:
-        benchmark_model(model_path=model_path, input_path=input_path, runs=runs, warmup=warmup)
+        benchmark_model(
+            model_path=model_path, input_path=input_path, runs=runs, warmup=warmup
+        )
     except Exception as exc:  # noqa: BLE001
         logger.exception("Benchmark failed", exc_info=exc)
         return 1
