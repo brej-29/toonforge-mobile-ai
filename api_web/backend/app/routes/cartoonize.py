@@ -7,8 +7,7 @@ from fastapi import APIRouter, File, Form, Header, Request, UploadFile
 from fastapi.responses import Response
 
 from ..config import settings
-from ..services.cartoonize_cloud import run_cartoonize_cloud
-from ..services.cartoonize_local import run_cartoonize_local
+from ..services import cartoonize_cloud, cartoonize_local
 from ..utils.errors import APIError
 
 logger = logging.getLogger(__name__)
@@ -57,9 +56,11 @@ async def cartoonize(
     )
 
     if mode == "local":
-        png_bytes, metrics = run_cartoonize_local(body, model_variant)
+        png_bytes, metrics = cartoonize_local.run_cartoonize_local(
+            body, model_variant
+        )
     else:
-        png_bytes, metrics = run_cartoonize_cloud(
+        png_bytes, metrics = cartoonize_cloud.run_cartoonize_cloud(
             body, model_variant, ip_token=x_ip_token
         )
 
