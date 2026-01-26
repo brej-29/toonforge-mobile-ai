@@ -254,17 +254,17 @@ CI (GitHub Actions) runs:
 
 The initial deployment strategy uses only free-tier services:
 
-- **Gradio Space (CPU-first, optional ZeroGPU)**  
+- **Gradio Space (CPU-first, optional ZeroGPU)**
   - `cloud_infer_gradio/` can be deployed as a Hugging Face Space (type: Gradio).
   - Runs TFLite cartoonization on CPU; optional `@spaces.GPU` decorator can leverage ZeroGPU if enabled.
-- **FastAPI backend (CPU)**  
+- **FastAPI backend (CPU)**
   - `api_web/backend/` can be deployed as a CPU-only Hugging Face Docker Space or another free-tier container service.
   - Calls the Gradio Space via `gradio_client` when `mode=cloud`.
   - Can also perform local TFLite inference when `mode=local` and models/deps are available.
-- **Streamlit web UI**  
+- **Streamlit web UI**
   - `api_web/web_streamlit/` can be deployed as a Hugging Face Streamlit Space or similar free host.
   - Communicates with the FastAPI backend (not directly with Gradio).
-- **Flutter mobile app**  
+- **Flutter mobile app**
   - Built and distributed outside CI.
   - Runs TFLite models offline and uses the FastAPI backend as a cloud mode (when network is available).
 
