@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from logging.config import dictConfig
 
 from .config import settings

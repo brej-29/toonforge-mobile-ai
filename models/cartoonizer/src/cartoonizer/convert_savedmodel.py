@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from .constants import CONVERTED_DIR, ensure_artifact_dirs
+from .constants import ensure_artifact_dirs
 from .quantize import convert_fp16, convert_fp32, convert_int8
 from .tflite_runner import TFLiteRunner, TFLiteModelInfo
 
@@ -106,13 +106,13 @@ def convert_savedmodel_variants(
         output_path = out_dir / f"model_{variant}.tflite"
 
         if variant == "fp32":
-            tflite_bytes = convert_fp32(savedmodel_dir, output_path)
+            convert_fp32(savedmodel_dir, output_path)
             options = {"optimization": "none", "inference_type": "float32"}
         elif variant == "fp16":
-            tflite_bytes = convert_fp16(savedmodel_dir, output_path)
+            convert_fp16(savedmodel_dir, output_path)
             options = {"optimization": "Optimize.DEFAULT", "inference_type": "float16"}
         elif variant == "int8":
-            tflite_bytes = convert_int8(
+            convert_int8(
                 saved_model_dir=savedmodel_dir,
                 output_path=output_path,
                 representative_data_dir=representative_data_dir,

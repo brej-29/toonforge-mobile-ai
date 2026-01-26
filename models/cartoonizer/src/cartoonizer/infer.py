@@ -36,7 +36,6 @@ def run_inference(
     )
 
     runner = TFLiteRunner(model_path)
-    model_info = runner.model_info
     expected_hw = runner.get_expected_hw(fallback=MODEL_PROFILE_DEFAULT.input_size)
 
     if expected_hw is not None:
