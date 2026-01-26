@@ -1,2 +1,10 @@
 gradio>=4.0.0
 Pillow>=10.0.0
+numpy>=1.24.0
+opencv-python-headless>=4.8.0
+requests>=2.31.0
+
+# Optional: TFLite interpreter. If not available, the cartoonizer package can
+# fall back to tensorflow.lite.Interpreter.
+# tflite-runtime>=2.11.0
+# tensorflow>=2.11.0

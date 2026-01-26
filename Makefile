@@ -4,7 +4,7 @@ WEB_DIR := api_web/web_streamlit
 GRADIO_DIR := cloud_infer_gradio
 MODEL_DIR := models/cartoonizer
 
-.PHONY: setup api web gradio test lint model-download model-infer model-benchmark model-convert
+.PHONY: setup api web gradio mobile test lint model-download model-infer model-benchmark model-convert
 
 setup:
 	@echo "Setup instructions:"
@@ -30,6 +30,15 @@ web:
 
 gradio:
 	cd $(GRADIO_DIR) && $(PYTHON) app.py
+
+mobile:
+	@echo "Mobile app helper:"
+	@echo "  cd mobile_app/toonforge_app"
+	@echo "  flutter pub get"
+	@echo "  flutter run"
+	@echo ""
+	@echo "Before running, copy a TFLite model into assets/models/ using:"
+	@echo "  bash mobile_app/scripts/copy_model_to_assets.sh <model>.tflite"
 
 test:
 	cd $(API_DIR) && pytest

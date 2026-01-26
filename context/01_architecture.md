@@ -6,7 +6,7 @@ This document describes the **high-level architecture** for the Mobile AI Cartoo
 
 The system comprises four main runtime components plus supporting assets:
 
-1. **Cloud inference (Gradio + ZeroGPU)**
+1. **Cloud inference (Gradio, CPU-first, optional ZeroGPU)**
 2. **API backend (FastAPI)**
 3. **Web UI (Streamlit)**
 4. **Mobile client (Flutter + TFLite)**
@@ -14,22 +14,23 @@ The system comprises four main runtime components plus supporting assets:
 ### Runtime components and data flow
 
 ```text
-[Flutter Mobile App]  -- HTTP (future) -->  [FastAPI Backend]  -- gradio_client (future) -->  [Gradio Space]
+[Flutter Mobile App]  -- HTTP -->  [FastAPI Backend]  -- gradio_client -->  [Gradio Space]
 
-[Streamlit Web UI]    -- HTTP (future) -->  [FastAPI Backend]
+[Streamlit Web UI]    -- HTTP -->  [FastAPI Backend]
 ```
 
 #### 1. Gradio Space (cloud_infer_gradio)
 
 - Implemented as a **Gradio app** deployed to **Hugging Face Spaces**.
-- Will use **ZeroGPU** for free GPU access.
+- Runs on **CPU by default**; an optional `@spaces.GPU` decorator allows ZeroGPU usage if enabled.
 - Responsibilities:
-  - Load and manage cartoonization models (future).
+  - Load and manage cartoonization TFLite models.
   - Provide a simple HTTP-compatible interface via Gradio for inference.
   - Scale horizontally by HF infrastructure (within free-tier constraints).
-- In the scaffold:
-  - `cartoonize_stub` returns the input image unchanged.
-  - Serves as a contract for how image data flows in and out.
+- Current implementation:
+  - Uses the shared `cartoonizer` package for TFLite inference.
+  - Downloads and caches TFLite models from TF Hub into a local cache directory.
+  - Exposes a function suitable for `gradio_client` calls from the FastAPI backend.
 
 #### 2. FastAPI backend (api_web/backend)
 
@@ -37,12 +38,13 @@ The system comprises four main runtime components plus supporting assets:
 - Responsibilities:
   - Provide a stable, versioned REST API for clients (web, mobile).
   - Perform input validation, authentication/authorization (future), and orchestration.
-  - Call the Gradio Space via `gradio_client` (future) for heavy cartoonization.
+  - Call the Gradio Space via `gradio_client` for cloud cartoonization (`mode=cloud`).
+  - Run local TFLite inference when configured (`mode=local`), using cached models.
   - Implement structured logging and centralized error handling.
-- In the scaffold:
-  - Exposes a `/health` endpoint with a typed response model.
-  - Configures JSON-like structured logging.
-  - Includes basic tests and CI integration.
+- Current implementation:
+  - Exposes `/health`, `/version`, `/v1/models`, and `/v1/cartoonize`.
+  - Uses JSON-like structured logging and centralized `APIError` handling.
+  - Includes tests and CI integration for non-model-dependent behavior.
 
 #### 3. Streamlit web UI (api_web/web_streamlit)
 
@@ -51,10 +53,12 @@ The system comprises four main runtime components plus supporting assets:
   - Provide a simple UI to upload images and trigger cartoonization.
   - Display results and error messages in a user-friendly way.
   - Communicate with the FastAPI backend (not directly with Gradio).
-- In the scaffold:
-  - Displays an image upload widget and a "Cartoonize" button.
-  - Uses a local stub function; the wiring to FastAPI is not implemented yet.
-  - Code is structured so that replacing the stub with an API client is straightforward.
+- Current implementation:
+  - Displays an image upload widget and controls for:
+    - `mode`: `local` or `cloud`.
+    - `model_variant`: `fp16` or `int8`.
+  - Calls the FastAPI `/v1/cartoonize` endpoint over HTTP.
+  - Shows latency metrics from response headers and allows downloading the result.
 
 #### 4. Flutter mobile app (mobile_app)
 
@@ -63,12 +67,15 @@ The system comprises four main runtime components plus supporting assets:
   - Offer an offline-first experience using **TFLite** models on-device.
   - Provide optional cloud mode by calling the FastAPI backend.
   - Handle image capture, gallery selection, and result sharing.
-- In the scaffold:
-  - No Flutter project is committed.
-  - Instead, documentation and scripts explain how to bootstrap a Flutter app that fits this architecture.
-  - Future work will add:
-    - A TFLite inference layer using `tflite_flutter`.
-    - A simple HTTP client to talk to the FastAPI backend.
+- Current implementation:
+  - Real Flutter app under `mobile_app/toonforge_app/`.
+  - Offline inference via `tflite_flutter`, running in an isolate to avoid UI jank.
+  - Cloud mode via HTTP calls to `/v1/cartoonize`.
+  - Settings persisted with `SharedPreferences` for:
+    - API base URL.
+    - Default mode (offline/cloud).
+    - Default model variant (fp16/int8).
+  - TFLite models are not committed; they are copied from `models/artifacts/downloaded/` into app assets via scripts.
 
 ## Repository layout and responsibilities
 

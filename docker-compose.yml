@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  api:
+    image: python:3.11-slim
+    working_dir: /app/api_web/backend
+    volumes:
+      - ./:/app
+    command: >
+      bash -c "pip install -r requirements.txt &&
+               uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=Mobile AI Cartoon Generation API
+      - ENVIRONMENT=docker-local
+
+  streamlit:
+    image: python:3.11-slim
+    working_dir: /app/api_web/web_streamlit
+    volumes:
+      - ./:/app
+    command: >
+      bash -c "pip install -r requirements.txt &&
+               streamlit run app.py --server.port=8501 --server.address=0.0.0.0"
+    ports:
+      - "8501:8501"
+    environment:
+      - API_BASE_URL=http://api:8000

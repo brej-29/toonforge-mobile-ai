@@ -10,20 +10,21 @@ This document outlines how to deploy the system using **free-tier** infrastructu
 
 ## Target environments
 
-### 1. Gradio Space (ZeroGPU) – Cloud inference
+### 1. Gradio Space (CPU-first, optional ZeroGPU) – Cloud inference
 
 - **Component**: `cloud_infer_gradio/`
 - **Platform**: Hugging Face Spaces
-- **Runtime**: Gradio + Python, using **ZeroGPU** once heavy models are added.
+- **Runtime**: Gradio + Python, running on **CPU by default**.
 - **Deployment approach**:
   1. Create a new Hugging Face Space (type: Gradio).
   2. Copy or mirror the `cloud_infer_gradio/` directory into the Space.
   3. Ensure `requirements.txt` is honored by HF Spaces.
   4. Expose the main Gradio app object (for example, `demo`) from `app.py`.
-  5. Once models are added, annotate GPU-heavy functions with `@spaces.GPU` to make use of ZeroGPU.
+  5. Optionally enable **ZeroGPU** in the Space settings, which activates the `@spaces.GPU` decorator on the main inference function.
 - **Notes**:
-  - This Space will act as the **GPU inference service**.
-  - It can run independently and be tested via the HF-hosted UI.
+  - This Space acts as the cloud inference service.
+  - It is fully functional on CPU-only hardware.
+  - ZeroGPU may require a PRO or org plan and is strictly optional.
 
 ### 2. FastAPI backend – CPU-only Space or lightweight host
 
@@ -31,15 +32,18 @@ This document outlines how to deploy the system using **free-tier** infrastructu
 - **Platform options**:
   - Hugging Face Space (type: "Docker" or "Gradio/Streamlit" with FastAPI adapter).
   - Any free-tier container host (Fly.io, Render free tier, etc.).
-- **Deployment approach (HF Space example)**:
+- **Deployment approach (HF Docker Space example)**:
   1. Create a new Hugging Face Space (e.g., type: Docker).
   2. Build a simple container image that:
      - Installs `api_web/backend/requirements.txt`.
-     - Runs `uvicorn app.main:app --host 0.0.0.0 --port 8000`.
+     - Optionally installs the `cartoonizer` package and its dependencies if you want local TFLite mode.
+     - Runs `uvicorn app.main:app --host 0.0.0.0 --port 7860`.
   3. Configure Space hardware: CPU-only.
+  4. Set `app_port` to `7860` in the Space configuration.
 - **Responsibilities**:
   - Expose HTTP endpoints consumed by the web and mobile clients.
-  - Use `gradio_client` in future revisions to call the Gradio Space.
+  - Use `gradio_client` to call the Gradio Space in cloud mode (`mode=cloud`).
+  - Run local TFLite inference in local mode (`mode=local`) when `cartoonizer` and models are installed.
 - **Notes**:
   - Keeping this CPU-only makes it cheap/free to host.
   - API versioning and backward compatibility should be handled here.
@@ -98,14 +102,14 @@ For early iterations:
    - Push `api_web/backend/` to a CPU-only HF Space or other free host.
    - Verify `/health` passes on the public URL.
 
-4. **Wire integrations** (future):
-   - Update FastAPI to call the Gradio Space via `gradio_client`.
-   - Update Streamlit to call the FastAPI backend.
-   - Update the Flutter app to call FastAPI for cloud mode.
+4. **Wire integrations**:
+   - FastAPI calls the Gradio Space via `gradio_client` in cloud mode.
+   - Streamlit calls the FastAPI backend for all cartoonization.
+   - Flutter calls FastAPI for cloud mode and uses TFLite locally for offline mode.
 
 5. **Deploy Streamlit Space**:
    - Push `api_web/web_streamlit/` to a Streamlit HF Space.
-   - Configure it to target the FastAPI backend URL.
+   - Configure it to target the FastAPI backend URL via the `API_BASE_URL` environment variable.
    - Smoke test the entire flow: upload image, trigger cartoonize, see response.
 
 6. **Iterate and improve**:

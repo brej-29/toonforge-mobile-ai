@@ -108,6 +108,65 @@ Format guideline:
   - Aligns with the core philosophy of the project.
 - **Status**: Accepted
 
+## DEC-0014 – CPU-first Gradio Space with optional ZeroGPU
+
+- **Date**: 2026-01-26
+- **Context**: We want cloud inference via Gradio, but cannot assume GPU availability or paid plans.
+- **Decision**: Implement the Gradio Space to run entirely on CPU by default, with an optional `@spaces.GPU` decorator that is only effective when ZeroGPU is explicitly enabled in the Space settings.
+- **Rationale**:
+  - Keeps the cloud path usable on free-tier CPU-only Spaces.
+  - Allows seamless opt-in to ZeroGPU for users with PRO/org plans.
+  - Avoids hard-coding any dependency on GPU availability or billing.
+- **Status**: Accepted
+
+## DEC-0015 – FastAPI wrapper calling Gradio via gradio_client
+
+- **Date**: 2026-01-26
+- **Context**: Web and mobile clients need a stable API that hides details of how cartoonization is implemented or hosted.
+- **Decision**: Use FastAPI as the canonical API surface and have it call the Gradio Space via `gradio_client` for cloud mode (`mode=cloud`), while supporting local TFLite inference (`mode=local`) when available.
+- **Rationale**:
+  - Centralizes API contract and validation in a single service.
+  - Allows changing or replacing the underlying Gradio/Space implementation without breaking clients.
+  - Enables a clean separation between user-facing APIs and model deployment.
+- **Status**: Accepted
+
+## DEC-0016 – Mobile offline-first with TFLite and cloud fallback
+
+- **Date**: 2026-01-26
+- **Context**: The mobile experience should be reliable even with poor connectivity, but still be able to leverage cloud models when available.
+- **Decision**: Design the Flutter app as offline-first using TFLite (via `tflite_flutter`) for on-device inference, with an optional cloud mode that calls the FastAPI backend.
+- **Rationale**:
+  - Ensures the app remains useful in low-connectivity or offline scenarios.
+  - Reduces latency and dependency on remote infrastructure for common use.
+  - Provides a path to heavier or experimental models via the cloud when desired.
+- **Status**: Accepted
+
+## DEC-0017 – No large binaries committed (model artifacts gitignored)
+
+- **Date**: 2026-01-26
+- **Context**: Model binaries are large and often subject to licensing constraints; they also slow down cloning and CI.
+- **Decision**: Keep all model artifacts (downloaded TFLite, converted variants, benchmarks) under gitignored directories (`models/artifacts/`, Flutter `assets/models/`), with scripts and docs describing how to populate them locally.
+- **Rationale**:
+  - Keeps the repository lightweight and fast to clone.
+  - Avoids accidental inclusion of large or licensed binary artifacts.
+  - Encourages reproducible pipelines (models are derived from code + config, not from git history).
+- **Status**: Accepted
+
+## DEC-0018 – Strong separation of concerns: Gradio, FastAPI, Streamlit, Flutter
+
+- **Date**: 2026-01-26
+- **Context**: We want to avoid tight coupling between UI, API, and inference layers so that each can evolve independently.
+- **Decision**: Maintain clear roles:
+  - Gradio Space: inference-only service.
+  - FastAPI: stable API contract and orchestration.
+  - Streamlit: browser-based client that talks only to FastAPI.
+  - Flutter: mobile client with offline TFLite and cloud mode via FastAPI.
+- **Rationale**:
+  - Simplifies reasoning about each component and its responsibilities.
+  - Makes it easier to replace or scale individual components without rewriting others.
+  - Keeps the architecture understandable and maintainable for new contributors.
+- **Status**: Accepted
+
 ## DEC-0009 – TF Hub TFLite download convention
 
 - **Date**: 2026-01-24

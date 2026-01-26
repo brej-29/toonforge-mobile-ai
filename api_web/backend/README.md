@@ -1,10 +1,12 @@
 # FastAPI backend
 
-This directory contains the **FastAPI backend** for the Mobile AI Cartoon Generation project. It is responsible for exposing a stable API surface for clients (Streamlit web UI, Flutter mobile app) and will orchestrate calls to the Gradio Space for heavy cartoonization.
+This directory contains the **FastAPI backend** for the Mobile AI Cartoon Generation project. It is responsible for exposing a stable API surface for clients (Streamlit web UI, Flutter mobile app) and orchestrates calls to the Gradio Space or local TFLite models for cartoonization.
 
-At this stage, the backend is a **runnable scaffold**:
+The backend is a **runnable service** with:
 
 - `/health` endpoint for basic liveness checks.
+- `/version` and `/v1/models` metadata endpoints.
+- `/v1/cartoonize` for image cartoonization (local TFLite or cloud Gradio Space).
 - Structured JSON-like logging.
 - Centralized error handling utilities.
 - Basic pytest-based tests.
@@ -16,18 +18,25 @@ At this stage, the backend is a **runnable scaffold**:
 backend/
 ├─ app/
 │  ├─ __init__.py
-│  ├─ main.py              # FastAPI app factory
-│  ├─ config.py            # Lightweight settings via env vars
-│  ├─ logging_config.py    # Structured logging configuration
+│  ├─ main.py                 # FastAPI app factory
+│  ├─ config.py               # Lightweight settings via env vars
+│  ├─ logging_config.py       # Structured logging configuration
 │  ├─ routes/
 │  │  ├─ __init__.py
-│  │  └─ health.py         # /health endpoint
+│  │  ├─ health.py            # /health endpoint
+│  │  ├─ meta.py              # /version and /v1/models
+│  │  └─ cartoonize.py        # /v1/cartoonize endpoint
+│  ├─ services/
+│  │  ├─ __init__.py
+│  │  ├─ cartoonize_local.py  # Local TFLite cartoonization helper
+│  │  └─ cartoonize_cloud.py  # Gradio Space (cloud) cartoonization helper
 │  └─ utils/
 │     ├─ __init__.py
-│     └─ errors.py         # Centralized error handling
+│     └─ errors.py            # Centralized error handling
 ├─ tests/
 │  ├─ __init__.py
-│  └─ test_health.py       # Basic test for /health
+│  ├─ test_health.py          # Basic test for /health
+│  └─ test_meta_and_cartoonize.py  # Tests for /version, /v1/models, and cartoonize validation
 ├─ requirements.txt
 └─ README.md
 ```
@@ -79,14 +88,20 @@ You should see a JSON response similar to:
 
 ## Configuration
 
-Configuration is intentionally simple and uses environment variables:
+Configuration is intentionally simple and uses environment variables (see `app/config.py`):
 
 - `APP_NAME` – Application name (default: `Mobile AI Cartoon Generation API`).
 - `LOG_LEVEL` – Logging level (default: `INFO`).
 - `ENVIRONMENT` – Environment name (default: `local`).
 - `APP_VERSION` – Application version (default: `0.0.0`).
+- `API_VERSION` – Public API version string (default: `v1`).
+- `GIT_SHA` – Optional git SHA for traceability (default: unset).
+- `GRADIO_SPACE_ID` – Hugging Face Space ID for cloud mode (e.g. `username/toonforge-cartoonizer`).
+- `GRADIO_API_NAME` – API name in the Gradio Space (default: `/predict`).
+- `MODEL_CACHE_DIR` – Directory for cached TFLite models (default: `./models/artifacts/downloaded`).
+- `MAX_UPLOAD_MB` – Maximum upload size for images in MB (default: `10`).
 
-These are read in `app/config.py`. There is no `.env` file by default; hosting platforms should set environment variables directly.
+There is no `.env` file by default; hosting platforms should set environment variables directly.
 
 ## Logging
 

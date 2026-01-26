@@ -9,13 +9,15 @@ This document outlines the initial testing strategy for the Mobile AI Cartoon Ge
 - Maintain **compatibility** with free-tier infrastructure and local dev environments.
 - Keep the test tooling **simple and standard** (pytest, Streamlit/Gradio smoke tests).
 
-## Scope (v0.0.0–v0.1.0)
+## Scope (v0.0.0–v0.2.0)
 
-At the scaffold stage and the initial model POC, tests focus on:
+At the scaffold stage, the initial model POC, and the first end-to-end wiring, tests focus on:
 
 - The **FastAPI backend**:
   - Health endpoint correctness.
   - Application creation and logging configuration.
+  - Metadata endpoints (`/version`, `/v1/models`).
+  - Basic validation behavior for `/v1/cartoonize` (without running real inference in CI).
 - The **cartoonizer model package**:
   - CLI parsing and basic behavior.
   - Preprocessing and postprocessing correctness on synthetic data.
@@ -53,28 +55,33 @@ Smoke tests for these components are manual for now.
 
 ### 2. Integration tests (future)
 
-Once the Gradio Space and FastAPI integration exist:
+With the Gradio Space and FastAPI integration in place, the next steps for integration testing are:
 
 - Write integration tests that:
   - Spin up the FastAPI app.
-  - Mock or call a test Gradio endpoint.
-  - Validate error handling when Gradio is unavailable or slow.
-- Consider adding **contract tests** between FastAPI and Gradio (stubbing `gradio_client`).
+  - Mock the Gradio client (`gradio_client.Client`) to avoid real network calls.
+  - Validate error handling when the upstream Space is unavailable or slow.
+- Consider adding **contract tests** between FastAPI and Gradio (stubbing `gradio_client`) to ensure the expected input/output shapes and types.
 
 ### 3. UI tests (manual, early stage)
 
-For v0.0.0 and early iterations:
+For v0.0.0–v0.2.0 and early iterations:
 
 - **Gradio**:
   - Manual check: run `python app.py` in `cloud_infer_gradio/`.
-  - Upload an image and confirm that the stub returns the same image.
+  - Upload an image and confirm that the cartoonized output and latency metrics appear.
 - **Streamlit**:
   - Manual check: run `streamlit run app.py` in `api_web/web_streamlit/`.
-  - Upload an image and click "Cartoonize"; confirm no errors and stub behavior.
+  - Upload an image, choose mode and variant, click "Cartoonize"; confirm the app:
+    - Calls the FastAPI backend.
+    - Shows the result image and latency headers.
 - **Flutter**:
-  - Once the app exists, use Flutter’s dev tools and basic widget tests.
+  - Once the app is configured with a model:
+    - Run on an emulator or device.
+    - Test offline mode (TFLite) and cloud mode (FastAPI).
+    - Use Flutter’s dev tools and basic widget tests locally.
 
-Automated UI testing may be considered later but is not required initially.
+Automated UI testing may be considered later but is not required initially, and is intentionally kept out of CI for cost and complexity reasons.
 
 ## CI integration
 
@@ -84,23 +91,25 @@ Automated UI testing may be considered later but is not required initially.
 - Steps:
   - Install Python and dependencies for:
     - `api_web/backend`
-    - `models/cartoonizer`
   - Run:
-    - `ruff` + `black --check` on backend and cartoonizer code.
+    - `ruff` + `black --check` on backend code.
     - `pytest` on backend tests.
-    - `pytest` on cartoonizer tests (which are designed to avoid model downloads and heavy optional deps).
 
 ### repo-lint workflow
 
 - Runs repository-wide checks:
-  - Format validation (ruff/black or pre-commit).
+  - Format validation (via `pre-commit` hooks).
   - Basic structure checks (presence of key files/directories).
 
-### CI and models
+### CI and models / external systems
 
-- CI **does not** download real models or run conversion/benchmark commands by default.
-- Cartoonizer tests and linters only rely on lightweight dependencies and synthetic data.
-- Developers can run full pipelines (download, infer, benchmark, convert) locally as needed.
+- CI **does not**:
+  - Download real models.
+  - Run conversion/benchmark commands.
+  - Call real Gradio Spaces.
+  - Build or test Flutter code.
+- Backend tests and linters only rely on lightweight dependencies and synthetic data.
+- Developers can run full pipelines (download, infer, benchmark, convert) and mobile/cloud integrations locally as needed.
 
 ## Test data
 
