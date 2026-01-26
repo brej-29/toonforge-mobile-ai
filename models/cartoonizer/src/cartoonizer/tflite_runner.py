@@ -14,7 +14,12 @@ def _import_interpreter() -> Any:
     """Import a TFLite Interpreter, preferring tflite-runtime.
 
     Returns the Interpreter class or raises a RuntimeError with a clear message.
+
+    On modern TensorFlow versions (e.g. 2.20+), the recommended entrypoint is
+    ``tf.lite.Interpreter`` rather than ``from tensorflow.lite import Interpreter``.
+    This helper handles both layouts.
     """
+    # 1) Try lightweight tflite-runtime first
     try:
         from tflite_runtime.interpreter import Interpreter  # type: ignore[import]
 
@@ -22,16 +27,26 @@ def _import_interpreter() -> Any:
         return Interpreter
     except ImportError:
         logger.info("tflite-runtime not available, trying TensorFlow Lite interpreter")
-        try:
-            from tensorflow.lite import Interpreter  # type: ignore[import]
 
-            logger.info("Using TensorFlow Lite Interpreter")
-            return Interpreter
-        except ImportError as exc:  # noqa: PERF203
-            raise RuntimeError(
-                "No TFLite interpreter available. Install either 'tflite-runtime' "
-                "or 'tensorflow' to run inference."
-            ) from exc
+    # 2) Fallback to TensorFlow Lite
+    try:
+        import tensorflow as tf  # type: ignore[import]
+
+        # Prefer the public attribute if available
+        Interpreter = getattr(tf.lite, "Interpreter", None)
+        if Interpreter is None:
+            # Older layouts exposed the class from a submodule
+            from tensorflow.lite.python.interpreter import (  # type: ignore[import]
+                Interpreter,
+            )
+
+        logger.info("Using TensorFlow Lite Interpreter")
+        return Interpreter
+    except (ImportError, AttributeError) as exc:  # noqa: PERF203
+        raise RuntimeError(
+            "No TFLite interpreter available. Install either 'tflite-runtime' "
+            "or 'tensorflow' to run inference."
+        ) from exc
 
 
 @dataclass
