@@ -1,0 +1,20 @@
+[project]
+name = "cartoonizer"
+version = "0.1.0"
+description = "Model pipeline (download, inference, conversion, benchmarking) for Mobile AI Cartoon Generation."
+authors = [{ name = "Mobile AI Cartoon Generation" }]
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+convert = ["tensorflow>=2.11.0", "huggingface_hub>=0.22.0"]
+runtime = ["tflite-runtime>=2.11.0"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
