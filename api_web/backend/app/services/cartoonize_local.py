@@ -17,15 +17,19 @@ logger = logging.getLogger(__name__)
 def _ensure_model_in_cache(model_id: str) -> Path:
     """Ensure the requested model is present in the local cache directory.
 
-    If the model file does not exist, this function will attempt to download it
-    from TF Hub using the same convention as the cartoonizer package:
-    https://tfhub.dev/<publisher>/lite-model/<model>/<variant>/<version>?lite-format=tflite
+    Unlike the standalone cartoonizer CLI, the backend no longer attempts to
+    auto-download models from TF Hub. Instead, it expects a valid TFLite file
+    to already exist in ``settings.model_cache_dir`` with a name derived from
+    the registry (for example, ``cartoongan-fp16.tflite``).
+
+    This avoids accidentally caching HTML error pages as “models” when a TF Hub
+    URL changes or is unavailable.
     """
     cache_dir = settings.model_cache_dir
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        from cartoonizer.constants import REGISTERED_MODELS, TFHUB_BASE_URL  # type: ignore[import]
+        from cartoonizer.constants import REGISTERED_MODELS  # type: ignore[import]
     except ImportError as exc:  # noqa: PERF203
         raise APIError(
             "Local cartoonization is not configured. Install the 'cartoonizer' package "
@@ -38,26 +42,42 @@ def _ensure_model_in_cache(model_id: str) -> Path:
 
     entry = REGISTERED_MODELS[model_id]
     model_path = cache_dir / f"{entry.model_id}.tflite"
-    if model_path.is_file():
-        return model_path
 
-    # Download from TF Hub into the cache directory.
-    import requests  # type: ignore[import]
+    if not model_path.is_file():
+        raise APIError(
+            (
+                f"Local cartoonization model '{entry.model_id}' not found at "
+                f"'{model_path}'. To use local mode, place a valid TFLite model "
+                "at this path (for example, generated via the cartoonizer CLI) "
+                "or adjust MODEL_CACHE_DIR. For now, you can use mode='cloud'."
+            ),
+            status_code=500,
+        )
 
-    url = f"{TFHUB_BASE_URL}/{entry.tfhub_id}?lite-format=tflite"
-    logger.info(
-        "Downloading local model",
-        extra={"url": url, "destination": str(model_path)},
-    )
-    with requests.get(url, stream=True, timeout=60) as r:
-        r.raise_for_status()
-        with model_path.open("wb") as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                if not chunk:
-                    continue
-                f.write(chunk)
+    # Basic sanity check: TFLite files start with the magic 'TFL3'
+    try:
+        with model_path.open("rb") as f:
+            magic = f.read(4)
+    except OSError as exc:
+        raise APIError(
+            f"Failed to read local model file at '{model_path}': {exc}",
+            status_code=500,
+        ) from exc
 
-    logger.info("Local model downloaded", extra={"destination": str(model_path)})
+    if magic != b"TFL3":
+        logger.error(
+            "Invalid TFLite model magic header",
+            extra={"model_path": str(model_path), "magic": repr(magic)},
+        )
+        raise APIError(
+            (
+                "Local cartoonization model is invalid (not a TFLite file). "
+                "Delete the file and replace it with a valid TFLite model. "
+                "See docs/model_pipeline.md for guidance."
+            ),
+            status_code=500,
+        )
+
     return model_path
 
 
