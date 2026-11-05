@@ -1,0 +1,75 @@
+{
+  "applicationCommit": "eb6be2dad155873db5e0901ac5bd61ec9525bf87",
+  "releaseRun": "https://github.com/brej-29/toonforge-mobile-ai/actions/runs/41978393522",
+  "ci": {
+    "verify": "success",
+    "deploy": "success",
+    "smoke": "success",
+    "coreTests": 10,
+    "browserTests": 7
+  },
+  "smoke": {
+    "url": "https://brej-29.github.io/toonforge-mobile-ai/",
+    "status": "passed",
+    "png": "manarola-sample-mono-ink.png",
+    "dimensions": [
+      1100,
+      733
+    ],
+    "reimportDecoded": true
+  },
+  "publicScreens": {
+    "url": "https://brej-29.github.io/toonforge-mobile-ai/",
+    "time": "2026-11-05T06:10:55.797Z",
+    "checks": [
+      {
+        "name": "mobile",
+        "width": 390,
+        "height": 844,
+        "http": 200,
+        "violations": [],
+        "overflow": false
+      },
+      {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024,
+        "http": 200,
+        "violations": [],
+        "overflow": false
+      },
+      {
+        "name": "desktop",
+        "width": 1440,
+        "height": 1000,
+        "http": 200,
+        "violations": [],
+        "overflow": false
+      }
+    ],
+    "errors": []
+  },
+  "liveLighthouse": {
+    "note": "Public deployment, fresh browser context",
+    "url": "https://brej-29.github.io/toonforge-mobile-ai/",
+    "time": "2026-11-05T06:11:20.444Z",
+    "version": "13.6.0",
+    "formFactor": "mobile",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "scores": {
+      "performance": 90,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcpMs": 965.8864999999993,
+    "tbtMs": 0
+  }
+}

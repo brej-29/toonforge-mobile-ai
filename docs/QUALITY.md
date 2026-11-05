@@ -20,10 +20,12 @@ Local mobile Lighthouse 13.6.0, Chromium 156, simulated throttling, production b
 
 Run `npx --yes lighthouse@13.6.0 <URL> --chrome-flags="--headless" --output=json --output-path=report.json` against production. The four requested category thresholds are at least 90. Automated checks do not replace assistive-technology testing; no manual screen-reader testing is claimed.
 
-[Recorded lab measurements](lighthouse-results.json) preserve timestamps, tool version, throttling settings, scores, LCP, and blocking time for all three runs.
+[Recorded lab measurements](lighthouse-results.json) preserve timestamps, tool version, throttling settings, scores, LCP, and blocking time for all runs. The public deployment measured **90 performance / 100 accessibility / 100 best practices / 100 SEO**, with LCP 1.0 seconds and total blocking time zero in this lab run. This meets the declared floor; field performance and other devices are unmeasured.
 
 The independent finish review checked all eight captures and source, then scored its four requested fixes resolved: selected-style focus contrast, worker failure stopping, asynchronous export integrity, and the one-time comparison reveal. The verdict is scoped to those fixes; runtime test results were checked by the build and CI workflows. Two extra browser cases cover worker/manual-retry/focus behaviour and delayed export/clear races.
 
 ## Release verification
 
-Pending first publication. The pipeline deploys after checks pass, then runs `npm run smoke` against the public HTTPS URL. This record will be updated with the actual run and result.
+Published from application commit `eb6be2dad155873db5e0901ac5bd61ec9525bf87` on 2026-11-05. [The production run](https://github.com/brej-29/toonforge-mobile-ai/actions/runs/41978393522) passed verify, deploy, and smoke. An independent fresh browser also completed local processing, Mono ink selection, download of a valid 1100×733 PNG, and successful browser decode through re-import. No account or prior browser state was used.
+
+Public screenshots at 390, 768, and 1440 pixels were captured and inspected; all three returned HTTP 200, had no automated AA violations, no horizontal overflow, and no runtime errors. The files are named live-mobile.png, live-tablet.png, and live-desktop.png in the excluded review directory. [Machine-readable release evidence](release-verification.json) records the run, dimensions, viewport checks, and live Lighthouse values.
