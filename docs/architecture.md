@@ -1,130 +1,32 @@
 # Architecture
 
-This document complements `context/01_architecture.md` with a higher-level, narrative description of how the pieces of the system fit together.
+The production application is a static TypeScript application built with Vite. The host serves the interface, code, fonts, and a labeled demonstration photo. User-selected photo bytes remain in browser memory; the core processing and export path needs no service credentials, model download, Python process, or remote inference endpoint.
 
-## Overview
-
-The **Mobile AI Cartoon Generation** system is designed around these principles:
-
-- **Free-first**: Use free-tier infrastructure such as Hugging Face Spaces and on-device inference.
-- **Multi-surface**: Support both web and mobile clients.
-- **Separation of concerns**: Distinct responsibilities for inference, API, and UI.
-- **Production-style from day one**: Logging, tests, CI, and clear documentation.
-
-## Component diagram
-
-```text
-+----------------------------------------------------------+
-|                      Clients                             |
-|                                                          |
-|  +------------------+     +---------------------------+  |
-|  | Flutter Mobile   |     | Streamlit Web UI         |  |
-|  | - Offline TFLite |     | - Browser-based UI       |  |
-|  | - Cloud via API  |     | - Calls FastAPI backend  |  |
-|  +---------+--------+     +-------------+------------+  |
-|            |                                |           |
-+------------|--------------------------------|-----------+
-             | HTTP (JSON)                    |
-             v                                v
-+------------+--------------------------------+-----------+
-|                  FastAPI Backend (CPU)                  |
-|  - Stable REST API                                      |
-|  - Validation, logging, error handling                  |
-|  - Calls Gradio Space via gradio_client (future)        |
-+------------+--------------------------------------------+
-             |
-             | Python client (gradio_client)
-             v
-+------------+--------------------------------------------+
-|          Gradio Space (ZeroGPU, GPU inference)          |
-|  - Hosts heavy cartoonization models                    |
-|  - Exposed as a Gradio interface                        |
-+---------------------------------------------------------+
-
-+---------------------------------------------------------+
-|                     Model Registry                      |
-|  - Metadata in models/MODEL_REGISTRY.md                 |
-|  - No weights in the repo                               |
-+---------------------------------------------------------+
+```mermaid
+flowchart LR
+    A[Local JPEG, PNG, or WebP] --> B[Decode and bound dimensions]
+    B --> C[RGBA buffer]
+    C --> D[Processing worker]
+    D --> E[Edge-aware smoothing]
+    E --> F[Palette reduction and outlines]
+    F --> G[Canvas preview and comparison]
+    G --> H[Local image or print export]
 ```
 
-## Data flow
+The UI owns file validation, decoding, preview state, settings, accessibility, and export controls. The pure processing module owns deterministic pixel transforms and measurable image statistics; Node tests and browser workers call the same implementation. A worker keeps pixel loops away from input handling. Output from an obsolete settings request must never overwrite a newer result. A processing failure must surface an actionable error and leave the source available for retry.
 
-1. **User action**:
-   - On web: User opens the Streamlit app, uploads an image, and clicks "Cartoonize".
-   - On mobile: User captures or selects an image in the Flutter app and chooses offline or cloud mode.
+## Why this stack
 
-2. **Offline path (mobile only, future)**:
-   - Flutter app runs the image through a local TFLite model.
-   - The result is rendered on-device and optionally cached or shared.
+A server-backed model is the next best option when learned style transfer is essential. It brings model licensing, artifact validation, availability, quotas, and uploaded-photo handling into the critical path—the starting repository's exact failure surface. This product chooses inspectable simplification and stable source geometry. It cannot promise semantic drawing, generated detail, identity changes, or the aesthetics of a trained model.
 
-3. **Cloud path**:
-   - Client (Streamlit or Flutter) sends a request to the FastAPI backend.
-   - FastAPI validates the request, logs structured context, and forwards it to the Gradio Space using `gradio_client` (future).
-   - The Gradio Space performs GPU-accelerated cartoonization and returns the result to FastAPI.
-   - FastAPI normalizes and returns the response to the client.
+Raw HTML/JavaScript could also implement this small application. TypeScript earns its place at RGBA/message/option boundaries, while Vite emits ordinary static files and gives production worker asset URLs. There is no database because no user account, durable gallery, or server-side photo storage is needed. Avoid adding a framework or service unless a measured workflow limitation requires one.
 
-4. **Observability**:
-   - FastAPI emits structured logs for incoming requests, outgoing Gradio calls, and errors.
-   - Over time, request IDs and correlation IDs can be added.
+## Resource and privacy boundaries
 
-## Why these technologies?
+Bound compressed input size and decoded dimensions before expensive transforms, then downsample to the supported working resolution. These are browser memory controls, not server upload limits. Browser image decoders may allocate memory before post-decode validation; extremely compressed images remain a documented limitation. Re-encoding through Canvas exports rendered pixels rather than copying camera metadata; the result is still identifiable image content and does not anonymize the subject.
 
-### Gradio + Hugging Face Spaces (ZeroGPU)
+Static hosting can still observe page/asset requests and ordinary connection information. A statement that photo bytes stay local does not mean the entire website has zero network traffic. Offline processing after assets are loaded and reliable offline reload are different capabilities; only claim the latter if the service-worker/cache tests establish it.
 
-- Gradio provides:
-  - Rapid prototyping for model UIs.
-  - Built-in HF Space integration.
-- ZeroGPU provides:
-  - Free access to GPU resources for short, bursty workloads.
-  - A good fit for inference-heavy cartoonization models.
+## Deployment and recovery
 
-### FastAPI
-
-- Strong typing and automatic documentation (OpenAPI).
-- Excellent performance and async support.
-- Clear separation between API contract and model/backend implementation.
-
-### Streamlit
-
-- Easy to build and iterate on web UIs in Python.
-- Friendly for experimentation and demos.
-- Integrates well in a Python-based monorepo.
-
-### Flutter + TFLite
-
-- Single codebase for Android and iOS.
-- TFLite supports efficient on-device inference on a wide range of devices.
-- Enables offline usage, reducing dependence on cloud infrastructure.
-
-## Monorepo rationale
-
-Using a monorepo:
-
-- Encourages shared tooling (CI, linting, formatting).
-- Keeps architecture, decisions, and implementation aligned over time.
-- Simplifies cross-component refactors (for example, changing APIs used by both web and mobile).
-
-Directory-level responsibilities:
-
-- `cloud_infer_gradio/`: GPU-oriented model serving.
-- `api_web/backend/`: Core API and orchestration.
-- `api_web/web_streamlit/`: Browser UI.
-- `mobile_app/`: Mobile bootstrap and, later, full Flutter app.
-- `models/`: Registry and metadata, not weights.
-- `docs/` and `context/`: Documentation and living spec.
-
-## Future considerations
-
-- **Security**:
-  - Auth mechanisms for the API (API keys, OAuth, or simple tokens).
-  - Rate limiting and abuse prevention for public endpoints.
-- **Scalability**:
-  - Moving from free-tier to low-cost paid tiers if needed.
-  - Caching frequently used styles or models.
-- **Extensibility**:
-  - Supporting multiple cartoon styles or models.
-  - Adding user accounts, galleries, or sharing features.
-- **Governance**:
-  - Keeping decisions and changes documented in `context/`.
-  - Establishing contribution processes for community growth.
+CI checks types, processing invariants, metric thresholds, static assets, and the main browser export flow. Default-branch deployment follows passing checks. A post-deployment browser smoke test uses the real public URL and decodes the downloaded PNG through re-import. The previous stack is archived under legacy and recoverable from backup tags; unfinished cloud/mobile modes are absent from the production UI.

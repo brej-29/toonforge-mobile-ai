@@ -1,0 +1,74 @@
+{
+  "method": "Lighthouse mobile simulated throttling; local Windows Chromium156; scores are lab results and vary by run.",
+  "runs": [
+    {
+      "note": "Initial run concurrent with browser checks",
+      "url": "http://127.0.0.1:4400/",
+      "time": "2026-11-05T05:46:42.990Z",
+      "version": "13.6.0",
+      "formFactor": "mobile",
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "scores": {
+        "performance": 77,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 91
+      },
+      "lcpMs": 943,
+      "tbtMs": 1065
+    },
+    {
+      "note": "Isolated repeat before final review fixes",
+      "url": "http://127.0.0.1:4400/",
+      "time": "2026-11-05T05:48:41.812Z",
+      "version": "13.6.0",
+      "formFactor": "mobile",
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "scores": {
+        "performance": 98,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 91
+      },
+      "lcpMs": 759.4455,
+      "tbtMs": 175
+    },
+    {
+      "note": "Final reviewed local build",
+      "url": "http://127.0.0.1:4400/",
+      "time": "2026-11-05T06:02:31.046Z",
+      "version": "13.6.0",
+      "formFactor": "mobile",
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "scores": {
+        "performance": 93,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 91
+      },
+      "lcpMs": 814,
+      "tbtMs": 317
+    }
+  ]
+}
