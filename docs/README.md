@@ -6,5 +6,6 @@
 - [Production architecture](architecture.md)
 - [Sources and asset licensing](SOURCES.md)
 - [Quality and release verification](QUALITY.md)
+- [Recorded public release checks](release-verification.json)
 
 Historical service and mobile documentation is preserved in [legacy/](../legacy/). The root README describes the supported application.

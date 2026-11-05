@@ -21,6 +21,18 @@ These references establish available mechanisms and tradeoffs. The reproducible 
 - [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits) states that public repositories are eligible under GitHub Free; published sites are limited to 1 GB and a soft 100 GB bandwidth/month. Deployments time out after ten minutes. Rate limits may return 429; there is no inference service that can exhaust a model quota or need warming.
 - The same Pages policy excludes sites primarily facilitating commercial transactions or commercial SaaS. This is a free open-source public utility with no transactions, account system, or hosted private image storage. A future commercial service would need another hosting choice and a fresh terms review.
 
+## Component and motion choices
+
+The tool review favours the editor's task and measured footprint rather than a collection of libraries:
+
+| Option reviewed | Published capability | Decision for this studio |
+| --- | --- | --- |
+| [Radix Primitives accessibility](https://www.radix-ui.com/primitives/docs/overview/accessibility) | Focus management, keyboard behaviour, and ARIA patterns for custom components | Useful for richer custom widgets. This screen can use actual buttons, ranges, labels, and disclosure elements, retaining native behaviour without a component runtime. |
+| [GSAP ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) | Scroll-linked animation, pinning, and progress control | Valuable for narrative surfaces; the image-editing task needs a stable comparison workspace. No scroll-driven effect is installed. |
+| [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API) | Browser animation timing and element effects | Selected for the single 550 ms comparison reveal. Wipe input cancels it, and reduced motion skips it. Ordinary hover/focus states use CSS. |
+
+The product references remain Squoosh, Photopea, and Adobe Express above. These choices are architectural judgments, not a measured claim that these libraries are slow or inaccessible. Dependency auditing and the Lighthouse record in [QUALITY.md](QUALITY.md) cover the actual chosen application.
+
 ## Bundled demonstration photograph
 
 `public/samples/scene.jpg` is a real photograph of Manarola, Italy by **Green Liu**. [Original photograph and license declaration](https://unsplash.com/photos/a-small-village-on-a-cliff-above-the-ocean-wBV8aZSRc4A); [Unsplash License](https://unsplash.com/license). The page marks it free under that license, not Unsplash+. The license allows downloading, copying, modifying, and distributing the photo, subject to its restrictions. It is bundled as a clearly labeled sample, not a user's work or a claimed processing benchmark dataset.

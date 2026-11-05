@@ -56,7 +56,7 @@ Ten core tests cover pixel invariants, image header validation, output bounds, s
 
 ## Deployment and limits
 
-Public address: **https://brej-29.github.io/toonforge-mobile-ai/**. Publication is configured from `main` through `.github/workflows/studio.yml`, after type checks, tests, evaluation, build, and browser checks pass. A separate job smoke-tests the public deployment. Release verification will be updated after first publication.
+**Live and verified:** https://brej-29.github.io/toonforge-mobile-ai/ . Publication runs from `main` through `.github/workflows/studio.yml`, after type checks, tests, evaluation, build, and browser checks pass. [The release run](https://github.com/brej-29/toonforge-mobile-ai/actions/runs/41978393522) passed verification, deployment, and the public PNG export/decode smoke test on 2026-11-05. Fresh public checks at phone, tablet, and desktop widths found no automated AA violations or horizontal overflow. Live Lighthouse: **90 performance / 100 accessibility / 100 best practices / 100 SEO**. [Recorded evidence](docs/release-verification.json)
 
 [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits): eligible public repositories on the free plan; 1 GB maximum site; soft 100 GB bandwidth/month; ten-minute deployment timeout; host rate limiting can return 429. This is a free open-source utility without commercial transactions or a commercial SaaS service. No new account, card, or paid tier is required. No inference cold start or model quota exists; outages still prevent an uncached first visit.
 
