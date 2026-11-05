@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e9e8fa" />
+  <meta name="description" content="Turn your photos into comic artwork and printable sheets. A free, private photo studio that processes every image on your device." />
+  <meta property="og:title" content="Toonforge — A little less photo. A little more story." />
+  <meta property="og:description" content="Make illustrated artwork from a photo. Three styles, a live comparison, and local PNG export. Your photos stay yours." />
+  <title>Toonforge — Your private comic print studio</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+</head>
+<body>
+  <a class="skip" href="#studio">Skip to the studio</a>
+  <header class="site-header">
+    <a class="wordmark" href="./" aria-label="Toonforge home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v17H17l-7 6v-6H5z"/><path d="M10 11h12M10 16h8"/></svg>toonforge<span class="brand-note">PHOTO / PRINT STUDIO</span></a>
+    <nav aria-label="Main navigation"><a href="#about">Why this exists</a><a href="https://github.com/brej-29/toonforge-mobile-ai" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="title">
+      <h1 id="title">A little less photo.<br><span>A little more story.</span></h1>
+      <div class="intro-copy"><p>Turn everyday photos into illustrated moments. <br>Make a handout, a print, or something just for you.</p><p class="local-promise"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="m8 12 3 3 5-6"/></svg>Private by design. Your photo stays here.</p></div>
+    </section>
+    <div class="connection" id="connection" hidden>You're offline. Your loaded photo still works. Sample images need to be cached first.</div>
+    <section class="studio" id="studio" aria-label="Photo illustration studio">
+      <div class="workspace">
+        <div class="workspace-toolbar"><div class="file-meta"><span class="file-dot"></span><span id="filename">Opening sample…</span><span id="dimensions"></span></div><div class="view-switch" role="group" aria-label="Preview view"><button data-view="compare" aria-pressed="true">Compare</button><button data-view="result" aria-pressed="false">Result</button><button data-view="original" aria-pressed="false">Original</button></div></div>
+        <div class="canvas-stage" id="dropzone" aria-busy="true">
+          <div class="empty-state" id="empty-state" hidden><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="8" width="38" height="32" rx="4"/><path d="m7 34 10-12 9 9 6-7 10 12"/><circle cx="32" cy="17" r="3"/></svg><h2>Your next little story starts here.</h2><p>Drop a photo, choose a file, or try the sample.</p><button class="primary empty-open" type="button">Choose a photo</button><button class="text-button" id="retry-sample">Try the sample</button></div>
+          <div class="image-frame" id="image-frame" hidden><canvas id="original" aria-label="Original photo"></canvas><div class="result-clip" id="result-clip"><canvas id="result" aria-label="Processed illustration"></canvas></div><div class="compare-label original-label">ORIGINAL</div><div class="compare-label result-label">TOONFORGE</div><div class="wipe-seam" id="wipe-seam"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4m8-8 4 4-4 4M12 5v14"/></svg></span></div><input id="wipe" class="wipe-input" type="range" min="0" max="100" value="56" aria-label="Comparison: percentage of illustration revealed" /></div>
+          <div class="processing" id="processing"><span class="spinner" aria-hidden="true"></span><span id="processing-label">Preparing your studio…</span></div>
+          <div class="drop-overlay" id="drop-overlay" hidden>Drop your photo here</div>
+        </div>
+        <div class="canvas-footer"><span id="sample-label">Labeled sample · processed live in your browser</span><button id="sample" class="text-button" type="button">Use sample</button><button class="upload-button" id="upload" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m-5 5 5-5 5 5M4 16v4h16v-4"/></svg>Open a photo</button></div>
+        <input type="file" id="file" accept="image/jpeg,image/png,image/webp" hidden />
+        <div class="error" id="error" role="alert" hidden></div>
+      </div>
+      <aside class="controls" aria-label="Illustration settings">
+        <div class="control-heading"><h2>Find your style</h2><span>3 looks. All yours.</span></div>
+        <div class="style-list" role="group" aria-label="Illustration style">
+          <button class="style-option" data-preset="soft-print" aria-pressed="true"><span class="swatch swatch-soft" aria-hidden="true"><i></i><i></i><i></i></span><span><strong>Soft print</strong><small>Quiet colours, gentle lines</small></span><span class="style-check" aria-hidden="true"></span></button>
+          <button class="style-option" data-preset="graphic-novel" aria-pressed="false"><span class="swatch swatch-graphic" aria-hidden="true"><i></i><i></i><i></i></span><span><strong>Graphic novel</strong><small>Bold tones, a little drama</small></span><span class="style-check" aria-hidden="true"></span></button>
+          <button class="style-option" data-preset="mono-ink" aria-pressed="false"><span class="swatch swatch-mono" aria-hidden="true"><i></i><i></i><i></i></span><span><strong>Mono ink</strong><small>Four tones, print-ready</small></span><span class="style-check" aria-hidden="true"></span></button>
+        </div>
+        <div class="adjustments"><div class="label-row"><label for="detail">Texture detail</label><output for="detail" id="detail-value">45</output></div><input id="detail" type="range" min="0" max="100" value="45"/><div class="range-caption"><span>Simpler</span><span>More texture</span></div><div class="label-row"><label for="ink">Outline strength</label><output for="ink" id="ink-value">35</output></div><input id="ink" type="range" min="0" max="100" value="35"/><div class="range-caption"><span>Softer</span><span>Bolder</span></div><button class="text-button reset" id="reset">Reset this style</button></div>
+        <div class="export-block"><button class="primary" id="download" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>Download PNG</button><button class="print-button" id="print" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7zM17 11h1"/></svg>Print a sheet</button><p id="export-note">No watermark. No sign-up.</p></div>
+      </aside>
+      <div class="metrics-strip" aria-label="Live measurements"><div><span class="metric-dot"></span><strong id="status">Getting ready</strong></div><div><span>Processing</span><strong id="metric-time">—</strong></div><div><span>Image darkness</span><strong id="metric-ink">—</strong></div><div><span>Image uploads</span><strong>0 bytes</strong></div><button id="clear" class="text-button" disabled>Clear photo</button></div>
+    </section>
+    <p class="studio-hint">Drag the divider to see the difference.<span>JPG, PNG or WebP · up to 20 MB · exports up to 1.5 MP</span></p>
+    <section class="about" id="about" aria-labelledby="about-title"><div class="about-story"><h2 id="about-title">Good ideas shouldn't<br>need an upload.</h2><p>A classroom handout. A zine about your neighbourhood. A print of a favourite place. Sometimes you need a simpler image, without a whole design suite.</p><p>Toonforge keeps the photo and the work on your device. It simplifies texture and draws outlines with predictable image filters. It doesn't invent details, and it isn't an anonymity tool.</p><a href="https://github.com/brej-29/toonforge-mobile-ai/blob/main/docs/WHY.md" target="_blank" rel="noopener noreferrer">Read the evidence & limitations <span aria-hidden="true">↗</span></a></div><div class="how"><h2>Less mystery. More making.</h2><details><summary>How does it work?</summary><p>An edge-aware filter smooths similar neighbouring colours. Tone quantization simplifies shading, then a Sobel edge map adds outlines. A background worker keeps the controls responsive. Every image is processed locally.</p></details><details><summary>What do the live numbers mean?</summary><p>Processing is the filter's elapsed time on your device, excluding decode and export. Image darkness is mean pixel darkness, not printer toner usage. Compare styles to see how your image changes. The upload count describes this editor's image workflow; your host still receives ordinary page requests.</p></details><details><summary>What has actually been tested?</summary><p id="evaluation-summary">Controlled synthetic fixtures test texture suppression and boundary retention against simple posterization. They measure engineering behaviour, not whether people prefer the artwork. The full plan and reproducible results are in the repository.</p><a href="https://github.com/brej-29/toonforge-mobile-ai/blob/main/docs/EVALUATION.md" target="_blank" rel="noopener noreferrer">Inspect the evaluation ↗</a></details><details><summary>What stays on my device?</summary><p>Your selected photo, processed pixels, and exports stay in browser memory. There is no photo server, analytics, or account. Clearing removes the active photo from the editor; downloaded files remain on your device. The app caches its public assets for offline use after the first visit.</p></details></div></section>
+  </main>
+  <footer class="site-footer"><span class="footer-brand">toonforge</span><span>A small studio for everyday stories.</span><a href="https://github.com/brej-29/toonforge-mobile-ai" target="_blank" rel="noopener noreferrer">Free & open source ↗</a></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
+  <section id="print-sheet"><h2 id="print-title">Made in Toonforge</h2><div id="print-image-slot"></div><p>Made locally with Toonforge · toonforge-mobile-ai</p></section>
+  <noscript>This photo studio needs JavaScript to process images on your device. No image is uploaded.</noscript>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

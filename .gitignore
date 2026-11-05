@@ -64,3 +64,16 @@ yarn-error.log*
 
 # Model artifacts (TFLite downloads, conversions, benchmarks)
 models/artifacts/
+
+# Local development and review artifacts
+.cache/
+.npm-cache/
+.venv/
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/seeds/
+test-results/
+playwright-report/
+*.local.md
+.[c]laude/
+.[c]odex/

@@ -1,276 +1,73 @@
-# Mobile AI Cartoon Generation Monorepo
+# Toonforge
 
-This repository is a free-first, production-style monorepo for a **Mobile AI Cartoon Generation** stack. It combines:
+**A private photo-to-print studio.** Open a photo, simplify it into comic artwork, compare the result, and download a PNG or print a sheet. Deterministic image filters run on your device.
 
-- A cloud inference service (Gradio on Hugging Face Spaces, CPU-first with optional ZeroGPU).
-- A FastAPI backend as a stable API layer for web and mobile.
-- A Streamlit web UI that talks to the backend.
-- A Flutter mobile app with offline TFLite inference and cloud fallback (code included; models copied locally by script).
-- A shared cartoonizer model package for TFLite download, conversion, and benchmarking.
+[Open the studio](https://brej-29.github.io/toonforge-mobile-ai/) · [Why this exists and 15 hard questions](docs/WHY.md) · [Evaluation](docs/EVALUATION.md)
 
-No large model binaries are committed; all artifacts live under gitignored folders and can be regenerated.
+## Problem and evidence
 
-## Architecture overview
+The working audience is teachers, workshop facilitators, and makers preparing illustrated handouts or small prints from their own photos. The hypothesis is that a focused local workflow helps when a full editor is too much and uploading the photo is undesirable. **Demand and a usability advantage are unvalidated.** Photopea already offers local editing; privacy alone is not a differentiator.
 
-High-level data flow and components:
+The original Flutter/Streamlit/FastAPI/Gradio stack supplied concrete failure evidence: **5 API tests passed**, yet real requests produced **0 PNG outputs in 2 mode attempts**. Local inference lacked a model; the cloud adapter lacked configuration. Its happy-path test returned mocked bytes instead of a decodable image. [The baseline audit](docs/BASELINE.md) records installation commands and observed responses.
 
-```text
-+-----------------------------+
-|       Mobile App (Flutter)  |
-|  - Offline TFLite           |
-|  - Cloud mode via FastAPI   |
-+--------------+--------------+
-               |
-               | HTTP (REST)
-               v
-+--------------+--------------+
-|      Streamlit Web UI       |
-|  - Browser-based front-end  |
-|  - Calls FastAPI /v1 APIs   |
-+--------------+--------------+
-               |
-               | HTTP (REST)
-               v
-+--------------+--------------+
-|   FastAPI Backend (CPU)     |
-|  - Stable API surface       |
-|  - /health, /version        |
-|  - /v1/models, /v1/cartoonize|
-|  - Local TFLite or Gradio   |
-+--------------+--------------+
-               |
-               | gradio_client (cloud mode)
-               v
-+-----------------------------+
-|  Gradio Space (CPU-first)   |
-|  - TFLite cartoonizer       |
-|  - Optional @spaces.GPU     |
-+-----------------------------+
+## Approach
 
-+-----------------------------+
-|   models/cartoonizer        |
-|  - TFLite download / infer  |
-|  - SavedModel->TFLite conv  |
-|  - Benchmarking + registry  |
-+-----------------------------+
+The production path is one static TypeScript/Vite application with Canvas and a processing worker. Range-weighted smoothing reduces texture, tone quantization simplifies shading, and Sobel gradients add outlines. There is no image API, model download, secret, or account.
+
+The studio includes three styles, texture/outline controls, a keyboard-operable comparison wipe, original/result views, transparent PNG export, printing, and live runtime/darkness measurements. It handles empty/error/slow states and works offline after caching public assets. A licensed sample is labeled and processed live. [Architecture](docs/architecture.md) · [Sources](docs/SOURCES.md)
+
+The previous stack is preserved in [legacy/](legacy/) and git history; it is excluded from deployment. Backup tags preserve both the original checked-out commit and the fetched default branch.
+
+## Targets and results
+
+The [plan](docs/EVALUATION_PLAN.md) was written locally before engine implementation. Acceptance: at least 50% lower flat-region noise than plain posterization; at least 90% clean boundary contrast retention; better boundary retention than box smoothing; preserved pixel invariants; median 512×512 runtime below 2 seconds.
+
+| Controlled measurement | Posterize | Box smoothing | Edge-aware |
+| --- | ---: | ---: | ---: |
+| Flat-region std, seed 29 | 30.11 | 0.00 | 0.00 |
+| Flat-region std, seed 71 | 30.19 | 0.00 | 0.00 |
+| Boundary contrast, seeds 29 / 71 | 116 / 117 | 63 / 63 | 127 / 127 |
+| Thin-line contrast, seeds 29 / 71 | 44.33 / 42.67 | 0.67 / 2.00 | 23.33 / 23.33 |
+
+All declared engineering thresholds pass. The clean boundary contrast is 120: 127 is **quantization overshoot**, not extra information. The low-contrast line weakens from 29.73/28.38 in the noisy input to 23.33. Inspect small text, hair, faces, and foliage before exporting.
+
+The checked-in local run's median is **98.44 ms**, five measured runs after warm-up on an i5-13450HX. This is not a phone benchmark. [Results and raw timings](docs/EVALUATION.md) include negative findings; `npm run evaluate` regenerates them, with naturally different runtimes. Synthetic fixtures prove neither artistic quality, toner savings, nor user preference.
+
+## Run and verify
+
+Node.js 24 and npm; no service credentials or environment variables.
+
+```sh
+npm ci
+npm run dev
 ```
 
-Key principles:
-
-- **Free-first**: Use Hugging Face Spaces (CPU + optional ZeroGPU), local dev environments, and other free-tier services.
-- **Monorepo**: All core components (cloud, API, web, mobile, models, docs, context) live in one repo.
-- **Production-style**: Structured logging, typed Python, tests, CI, and clear documentation from day one.
-- **Context-aware**: The `context/` folder tracks goals, architecture, decisions, and change history.
-- **Artifact-safe**: No large binaries in git; everything under `models/artifacts/` or app assets is regenerated or copied by scripts.
-
-## Repository layout
-
-Summarized:
-
-- `cloud_infer_gradio/` – Gradio app for cloud cartoonization (CPU-first, ZeroGPU-ready).
-- `api_web/backend/` – FastAPI backend with `/health`, `/version`, `/v1/models`, and `/v1/cartoonize`.
-- `api_web/web_streamlit/` – Streamlit web front-end that calls FastAPI.
-- `mobile_app/` – Flutter app (`toonforge_app/`) for offline TFLite + cloud fallback, plus scripts/docs.
-- `models/cartoonizer/` – Model pipeline: TF Hub download, TFLite inference, conversion/quantization, benchmarking.
-- `models/MODEL_REGISTRY.md` – Logical registry of models (no weights).
-- `docs/` – High-level docs (architecture, API contract, deployment, mobile build).
-- `context/` – Living project spec: goals, architecture, decisions, change log, deploy/test plans.
-
-## Local development
-
-### Prerequisites
-
-- Python 3.10+ (recommended).
-- `pip` and virtualenv support.
-- `make`, `pre-commit`, and `git` (recommended).
-- Flutter SDK for running the mobile app (not required for CI or Python services).
-
-Create a virtual environment at the repo root if desired:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\\Scripts\\activate
+```sh
+npm test
+npm run evaluate
+npm run build
+npx playwright install chromium
+npm run test:e2e
 ```
 
-### FastAPI backend (api_web/backend)
+Use `npm.cmd` / `npx.cmd` on PowerShell if script execution is disabled. Browser tests start a strict-port preview on 127.0.0.1:4399. For a deployed check, set `LIVE_URL` to the HTTPS address and run `npm run smoke`.
 
-Install dependencies and run the API:
+Ten core tests cover pixel invariants, image header validation, output bounds, safe filenames, and declared signal thresholds. Seven browser tests exercise real PNG download/re-import, controls, printing, invalid input, empty/slow states, offline reload, and automated AA checks at 390, 768, and 1440 pixels. CI attaches screenshots and evaluation JSON for seven days. [Quality evidence](docs/QUALITY.md)
 
-```bash
-cd api_web/backend
-pip install -r requirements.txt
+## Deployment and limits
 
-# Run with uvicorn
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
+Public address: **https://brej-29.github.io/toonforge-mobile-ai/**. Publication is configured from `main` through `.github/workflows/studio.yml`, after type checks, tests, evaluation, build, and browser checks pass. A separate job smoke-tests the public deployment. Release verification will be updated after first publication.
 
-Or from the repo root using the Makefile:
+[GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits): eligible public repositories on the free plan; 1 GB maximum site; soft 100 GB bandwidth/month; ten-minute deployment timeout; host rate limiting can return 429. This is a free open-source utility without commercial transactions or a commercial SaaS service. No new account, card, or paid tier is required. No inference cold start or model quota exists; outages still prevent an uncached first visit.
 
-```bash
-make api
-```
+Offline reload requires completed public-asset caching. Storage eviction, private browsing, or a first visit without internet can prevent it. Updates may activate on a subsequent visit/reload. Hosting sees ordinary page requests; selected photos are not transmitted by the editor.
 
-Then open: http://127.0.0.1:8000/health and http://127.0.0.1:8000/version.
+JPG/PNG/WebP inputs: up to 20 MiB, 40 million source pixels, and 20,000 pixels per side. Output downsamples to at most 1.5 million pixels and 8,192 per side, without upscaling. This suits small prints/web artwork rather than high-resolution posters. Browser memory and decoding can still fail. There is no saved gallery; reloading discards a selected photo. Image darkness is a screen statistic, not measured printer ink usage. Processing does not anonymize a subject.
 
-Key endpoints:
+## Documentation and licensing
 
-- `GET /health`
-- `GET /version`
-- `GET /v1/models`
-- `POST /v1/cartoonize` (multipart: `image`, `mode=local|cloud`, `model_variant=fp16|int8`, `output=png`)
+- [WHY: alternatives, tradeoffs, falsification, and 15 questions](docs/WHY.md)
+- [Original failure evidence](docs/BASELINE.md), [evaluation plan](docs/EVALUATION_PLAN.md), [results](docs/EVALUATION.md)
+- [Product assumptions](PRODUCT.md), [design system](DESIGN.md), [quality evidence](docs/QUALITY.md)
 
-### Streamlit web UI (api_web/web_streamlit)
-
-Install dependencies and run the app:
-
-```bash
-cd api_web/web_streamlit
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Or from the repo root:
-
-```bash
-make web
-```
-
-The Streamlit app:
-
-- Accepts image uploads.
-- Lets you choose `local` or `cloud` mode and `fp16`/`int8` variant.
-- Calls the FastAPI `/v1/cartoonize` endpoint.
-- Displays the cartoonized result, latency headers, and a PNG download button.
-
-Set `API_BASE_URL` to point to your backend if not using the default `http://127.0.0.1:8000`.
-
-### Gradio cloud app (cloud_infer_gradio)
-
-Install dependencies and run the Gradio interface locally:
-
-```bash
-cd cloud_infer_gradio
-pip install -r requirements.txt
-# Install the shared cartoonizer package if you want real inference:
-# pip install -e ../models/cartoonizer
-python app.py
-```
-
-Or from the repo root:
-
-```bash
-make gradio
-```
-
-The Gradio app:
-
-- Downloads TFLite models from TF Hub on first use (into `cloud_infer_gradio/models_cache/`).
-- Runs cartoonization via the shared `cartoonizer` pipeline on CPU.
-- Shows latency metrics in the UI.
-- Uses an optional `@spaces.GPU` decorator that becomes active only when ZeroGPU is enabled in HF Spaces settings.
-
-### Cartoonizer model pipeline (models/cartoonizer)
-
-The `cartoonizer` package provides:
-
-- TF Hub TFLite downloads (using `?lite-format=tflite`).
-- Local inference on images.
-- SavedModel → TFLite conversion (fp32, fp16, int8).
-- Benchmarking of latency and size.
-
-From `models/cartoonizer`:
-
-```bash
-pip install -r requirements.txt
-pip install -e .
-
-# CLI help
-python -m cartoonizer --help
-
-# Download models (if TF Hub IDs are valid)
-python -m cartoonizer download --model-id cartoongan-fp16
-
-# Inference
-python -m cartoonizer infer --model ../artifacts/downloaded/cartoongan-fp16.tflite \
-  --input /path/to/input.jpg \
-  --output /path/to/output_cartoon.jpg
-
-# Benchmark
-python -m cartoonizer benchmark --model ../artifacts/downloaded/cartoongan-fp16.tflite \
-  --input /path/to/input.jpg
-```
-
-All artifacts are stored under `models/artifacts/` (gitignored).
-
-### Flutter mobile app (mobile_app/toonforge_app)
-
-A real Flutter app is included under `mobile_app/toonforge_app/`:
-
-- Offline TFLite inference via `tflite_flutter` (model not committed).
-- Cloud fallback via FastAPI `/v1/cartoonize`.
-- Image picking (gallery), progress indicators, latency display.
-- Settings screen for API base URL, default mode, and model variant.
-- Scripts under `mobile_app/scripts/` to copy a TFLite model from `models/artifacts/downloaded/` into Flutter assets.
-
-See:
-
-- `mobile_app/README.md`
-- `mobile_app/toonforge_app/README.md`
-- `docs/mobile_build.md`
-
-for detailed setup and build instructions.
-
-> CI does **not** build or test Flutter code; mobile is a local-only build target.
-
-### Tooling
-
-From the repo root, after installing dev tools (`pip install black ruff pre-commit`), you can run:
-
-```bash
-# Run tests for the FastAPI backend
-make test
-
-# Run linters (ruff + black --check) across the Python code
-make lint
-
-# Helpful setup instructions
-make setup
-```
-
-To enable `pre-commit`:
-
-```bash
-pre-commit install
-pre-commit run --all-files
-```
-
-CI (GitHub Actions) runs:
-
-- Backend tests and linting.
-- Cartoonizer package tests and linting.
-- No Flutter builds and no model downloads.
-
-## Deployment plan (free-first)
-
-The initial deployment strategy uses only free-tier services:
-
-- **Gradio Space (CPU-first, optional ZeroGPU)**
-  - `cloud_infer_gradio/` can be deployed as a Hugging Face Space (type: Gradio).
-  - Runs TFLite cartoonization on CPU; optional `@spaces.GPU` decorator can leverage ZeroGPU if enabled.
-- **FastAPI backend (CPU)**
-  - `api_web/backend/` can be deployed as a CPU-only Hugging Face Docker Space or another free-tier container service.
-  - Calls the Gradio Space via `gradio_client` when `mode=cloud`.
-  - Can also perform local TFLite inference when `mode=local` and models/deps are available.
-- **Streamlit web UI**
-  - `api_web/web_streamlit/` can be deployed as a Hugging Face Streamlit Space or similar free host.
-  - Communicates with the FastAPI backend (not directly with Gradio).
-- **Flutter mobile app**
-  - Built and distributed outside CI.
-  - Runs TFLite models offline and uses the FastAPI backend as a cloud mode (when network is available).
-
-Detailed deployment and evolution steps are described in:
-
-- `context/06_deploy_plan.md`
-- `docs/architecture.md`
-- `docs/deployment_hf.md`
-- `docs/api_contract.md`.
+Code: MIT. The sample is by Green Liu under the [Unsplash License](https://unsplash.com/license), separately credited in [SOURCES.md](docs/SOURCES.md). Bundled Manrope fonts use the SIL Open Font License, included in public/FONT-LICENSE.txt.

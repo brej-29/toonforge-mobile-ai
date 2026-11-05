@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-05T06:05:34Z",
+  "title": "Design System: Toonforge",
+  "extensions": {
+    "shadows": [
+      { "name": "studio", "value": "0 14px 40px -20px #4d407536", "purpose": "Diffuse shadow beneath the white editor." },
+      { "name": "comparison-handle", "value": "0 2px 10px #0002", "purpose": "Keep the circular handle readable over the image." },
+      { "name": "comparison-seam", "value": "drop-shadow(0 1px 2px #0004)", "purpose": "Filter shadow on the vertical comparison seam." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(.16,1,.3,1)", "purpose": "Result reveal and toast movement." },
+      { "name": "result-reveal", "value": "550ms", "purpose": "First processed result for a new image in Compare view; skipped for reduced motion." },
+      { "name": "control-transition", "value": "background-color 160ms,color 160ms,box-shadow 160ms", "purpose": "Button, link, and summary state changes." },
+      { "name": "spinner", "value": "spin 1s linear infinite", "purpose": "Loading indicator rotation." },
+      { "name": "toast", "value": "opacity .2s,transform .3s var(--ease)", "purpose": "Transient status appearance." },
+      { "name": "reduced-motion", "value": "animation:none!important;transition:none!important;scroll-behavior:auto!important", "purpose": "Applied to all elements and pseudo-elements when prefers-reduced-motion is reduce; the result reveal is also skipped in script." }
+    ],
+    "breakpoints": [
+      { "name": "wide-preview", "value": "min-width:1700px" },
+      { "name": "compact-desktop", "value": "max-width:1100px" },
+      { "name": "tablet", "value": "max-width:900px" },
+      { "name": "phone", "value": "max-width:480px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The warm download action and empty-state photo action.",
+      "html": "<button class=\"ds-primary\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4\"/></svg>Download PNG</button>",
+      "css": ".ds-primary{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--yellow);color:var(--ink);border:0;border-radius:7px;padding:13px 16px;font-family:Manrope,sans-serif;font-size:12px;font-weight:800;min-height:44px;cursor:pointer;transition:background-color 160ms,color 160ms,box-shadow 160ms}.ds-primary svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.ds-primary:hover:not(:disabled){filter:brightness(.96)}.ds-primary:focus-visible{outline:3px solid var(--focus);outline-offset:4px}.ds-primary:disabled{opacity:.5;cursor:not-allowed}@media(max-width:480px){.ds-primary{font-size:11px}}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
+    },
+    {
+      "name": "Print action",
+      "kind": "button",
+      "refersTo": "button-print",
+      "description": "A quiet outlined export choice.",
+      "html": "<button class=\"ds-print\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7zM17 11h1\"/></svg>Print a sheet</button>",
+      "css": ".ds-print{display:flex;justify-content:center;align-items:center;gap:8px;width:100%;background:none;color:var(--ink);font-family:Manrope,sans-serif;font-size:11px;font-weight:700;border:1px solid var(--line);border-radius:7px;min-height:38px;cursor:pointer;transition:background-color 160ms,color 160ms,box-shadow 160ms}.ds-print svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.ds-print:hover:not(:disabled){filter:brightness(.96)}.ds-print:focus-visible{outline:3px solid var(--focus);outline-offset:4px}.ds-print:disabled{opacity:.5;cursor:not-allowed}@media(max-width:480px){.ds-print{font-size:10px}}@media(prefers-reduced-motion:reduce){.ds-print{transition:none}}"
+    },
+    {
+      "name": "Text action",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "An underlined sample or reset action.",
+      "html": "<button class=\"ds-text\">Use sample</button>",
+      "css": ".ds-text{background:none;border:0;color:var(--ink);text-decoration:underline;text-underline-offset:4px;padding:3px 0;font-family:Manrope,sans-serif;font-size:11px;font-weight:600;white-space:nowrap;min-height:24px;cursor:pointer;transition:background-color 160ms,color 160ms,box-shadow 160ms}.ds-text:hover:not(:disabled){filter:brightness(.96)}.ds-text:focus-visible{outline:3px solid var(--focus);outline-offset:4px}.ds-text:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-text{transition:none}}"
+    },
+    {
+      "name": "Preview selector",
+      "kind": "chip",
+      "refersTo": "view-switch",
+      "description": "Explicit Compare, Result, and Original preview choices.",
+      "html": "<div class=\"ds-switch\" role=\"group\" aria-label=\"Preview view\"><button aria-pressed=\"true\">Compare</button><button aria-pressed=\"false\">Result</button><button aria-pressed=\"false\">Original</button></div>",
+      "css": ".ds-switch{display:inline-flex;background:var(--switch-ground,#f1f0f8);border-radius:6px;padding:3px;font-family:Manrope,sans-serif;font-size:10px}.ds-switch button{font:inherit;color:var(--ink);border:0;background:none;padding:6px 9px;border-radius:4px;cursor:pointer;transition:background-color 160ms,color 160ms,box-shadow 160ms}.ds-switch button[aria-pressed=true]{background:var(--ink);color:var(--paper)}.ds-switch button:hover{filter:brightness(.96)}.ds-switch button:focus-visible{outline:3px solid var(--focus);outline-offset:4px}@media(max-width:480px){.ds-switch{font-size:9px}.ds-switch button{padding:6px 7px}}@media(prefers-reduced-motion:reduce){.ds-switch button{transition:none}}"
+    },
+    {
+      "name": "Style choice",
+      "kind": "chip",
+      "refersTo": "style-option-selected",
+      "description": "Selected style with a pale surface and an independent keyboard focus ring.",
+      "html": "<button class=\"ds-style\" aria-pressed=\"true\"><span class=\"ds-swatch\" aria-hidden=\"true\"><i></i><i></i><i></i></span><span><strong>Soft print</strong><small>Quiet colours, gentle lines</small></span><span class=\"ds-check\" aria-hidden=\"true\"></span></button>",
+      "css": ".ds-style{display:flex;align-items:center;gap:10px;text-align:left;padding:10px 9px;border:0;border-radius:8px;outline:1px solid transparent;outline-offset:-1px;background:none;color:var(--ink);font-family:Manrope,sans-serif;cursor:pointer;transition:background-color 160ms,color 160ms,box-shadow 160ms}.ds-style[aria-pressed=true]{background:var(--selected-ground,#efedf9);outline-color:var(--selected-line,#a69dcf)}.ds-style strong{display:block;font-size:13px;font-weight:800}.ds-style small{display:block;color:var(--muted);font-size:10px;margin-top:3px;white-space:nowrap}.ds-swatch{width:36px;height:36px;border-radius:6px;overflow:hidden;display:flex;transform:rotate(-4deg);flex-shrink:0}.ds-swatch i{flex:1;background:#d8cbbf}.ds-swatch i:first-child{background:#b4ba9b}.ds-swatch i:last-child{background:#839bb1}.ds-check{width:13px;height:13px;border:1px solid #c4bfd7;border-radius:50%;margin-left:auto;flex-shrink:0}.ds-style[aria-pressed=true] .ds-check{border:4px solid var(--ink)}.ds-style:hover{filter:brightness(.96)}.ds-style:focus-visible{outline:3px solid var(--focus);outline-offset:4px}@media(max-width:900px){.ds-style{display:block;position:relative;min-height:94px;padding:12px}.ds-swatch{display:none}.ds-style strong{font-size:12px;margin-top:2px}.ds-style small{white-space:normal;line-height:1.6;margin-top:5px;max-width:15ch}.ds-check{position:absolute;right:8px;top:11px;width:9px;height:9px}.ds-style[aria-pressed=true] .ds-check{border-width:3px}}@media(max-width:480px){.ds-style{padding:10px 8px}.ds-style strong{font-size:11px;max-width:9ch;line-height:1.4;padding-right:7px}.ds-style small{font-size:9px}.ds-check{top:12px;right:7px}}@media(prefers-reduced-motion:reduce){.ds-style{transition:none}}"
+    },
+    {
+      "name": "Adjustment range",
+      "kind": "input",
+      "description": "Native range input with tabular output and endpoint captions.",
+      "html": "<div class=\"ds-adjustment\"><div class=\"ds-label\"><label for=\"ds-texture\">Texture detail</label><output for=\"ds-texture\">45</output></div><input id=\"ds-texture\" type=\"range\" min=\"0\" max=\"100\" value=\"45\"><div class=\"ds-caption\"><span>Simpler</span><span>More texture</span></div></div>",
+      "css": ".ds-adjustment{font-family:Manrope,sans-serif;color:var(--ink)}.ds-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800}.ds-label output{font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted)}.ds-adjustment input{width:100%;margin:11px 0 0;accent-color:var(--ink);color:var(--ink);cursor:pointer;height:16px;touch-action:manipulation}.ds-adjustment input:focus-visible{outline:3px solid var(--focus);outline-offset:4px}.ds-caption{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:19px}@media(max-width:900px){.ds-label{font-size:11px}.ds-caption{font-size:9px;margin-bottom:0}}"
+    },
+    {
+      "name": "Header navigation",
+      "kind": "nav",
+      "description": "Compact utility navigation that reduces to its first link on tablets and phones.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a href=\"#about\">Why this exists</a><a href=\"#source\">Source <span aria-hidden=\"true\">â†—</span></a></nav>",
+      "css": ".ds-nav{display:flex;gap:30px;font-family:Manrope,sans-serif;font-size:12px;font-weight:700;color:var(--ink)}.ds-nav a{color:inherit;text-decoration:none;text-underline-offset:5px;transition:background-color 160ms,color 160ms,box-shadow 160ms}.ds-nav a:hover{text-decoration:underline}.ds-nav a:focus-visible{outline:3px solid var(--focus);outline-offset:4px}.ds-nav span{padding-left:5px}@media(max-width:900px){.ds-nav{gap:18px;font-size:10px}.ds-nav a:last-child{display:none}}@media(prefers-reduced-motion:reduce){.ds-nav a{transition:none}}"
+    },
+    {
+      "name": "Working surface",
+      "kind": "card",
+      "refersTo": "studio",
+      "description": "White editor shell with a narrow settings rail and a full-width measurement strip.",
+      "html": "<section class=\"ds-studio\" aria-label=\"Photo illustration studio\"><div class=\"ds-workspace\">Image workspace</div><aside class=\"ds-controls\">Illustration settings</aside><div class=\"ds-metrics\"><span>Made on your device</span><span>Processing <strong>443 ms</strong></span></div></section>",
+      "css": ".ds-studio{display:grid;grid-template-columns:minmax(0,1fr) 286px;background:var(--paper);color:var(--ink);font-family:Manrope,sans-serif;border-radius:16px;box-shadow:0 14px 40px -20px #4d407536;overflow:hidden}.ds-workspace{min-width:0;position:relative}.ds-controls{border-left:1px solid var(--line);padding:23px 22px 16px;display:flex;flex-direction:column}.ds-metrics{grid-column:1/-1;background:var(--metrics-ground,#f8f7fc);border-top:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;gap:33px;font-size:10px}.ds-metrics strong{font-variant-numeric:tabular-nums;font-weight:700}@media(max-width:1100px){.ds-studio{grid-template-columns:minmax(0,1fr) 260px}.ds-controls{padding:20px 16px}.ds-metrics{gap:20px}}@media(max-width:900px){.ds-studio{grid-template-columns:1fr}.ds-controls{border-left:0;border-top:1px solid var(--line);padding:20px}.ds-metrics{gap:17px;padding:13px 17px;flex-wrap:wrap;row-gap:10px}}@media(max-width:480px){.ds-controls{padding:19px 15px 16px}.ds-metrics{column-gap:16px;font-size:9px}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Animation festival programme",
+    "overview": "An open periwinkle field, deep navy typography, and a white working surface frame the photograph. Manrope gives the studio a friendly, precise voice. Yellow makes the next export action easy to find while the broad image aperture carries the visual interest.\n\nThe character comes from colour, compact utility labels, and the comparison seam. Controls keep familiar button, range, and disclosure behaviour. Motion briefly reveals a newly processed image; the same information remains available through explicit preview choices and reduced-motion behaviour.",
+    "keyCharacteristics": [
+      "Periwinkle ground with navy text and white working surfaces.",
+      "A large, contained image preview and a compact settings rail.",
+      "Yellow primary actions, quiet outlined print actions, and visible selected states.",
+      "Friendly Manrope, strong headlines, and tabular measurements.",
+      "A draggable comparison seam with a brief eased reveal."
+    ],
+    "rules": [],
+    "dos": [
+      "Do keep the photograph and comparison seam visually dominant within the white working surface.",
+      "Do use the established yellow primary action, navy control text, and periwinkle page ground.",
+      "Do preserve visible keyboard focus independently of selected states.",
+      "Do retain explicit preview choices and the reduced-motion path alongside the draggable seam.",
+      "Do apply the tablet and phone layout changes together with their typography overrides."
+    ],
+    "donts": [
+      "Don't crop the preview to fill its aperture; preserve the image's aspect ratio.",
+      "Don't show a result or comparison seam before processed pixels are ready.",
+      "Don't replace the established native ranges and disclosures with decorative controls.",
+      "Don't carry the screen interface onto the printed sheet."
+    ]
+  }
+}

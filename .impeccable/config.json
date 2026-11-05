@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-05T05:50:37.694Z",
+        "reason": "Rendered h1 is 48px and paragraph text is 14px. HTML-only detection misses the stylesheet imported by the entry module."
+      }
+    ]
+  }
+}
