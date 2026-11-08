@@ -1,5 +1,17 @@
 # Architecture
 
+## 2.1 workbench and agent extension
+
+The photo path below remains local. The worker now also computes a 32-bin alpha-weighted source luminance histogram, standard deviation and adjacent-pixel transition density. `src/workbench.ts` displays those measurements, applies explicit heuristic suggestions, and manages twelve validated recipes in local storage. `src/lib/recipes.ts` is shared across stored settings, hash links, local command plans, model replies and MCP settings.
+
+The optional `src/lib/text-model.ts` connection sends a bounded instruction, current settings and three numeric aggregates directly to the visitor's selected compatible provider. It sends neither photo bytes nor filenames. Keys stay in form/tab memory. A plan is strict JSON with supported styles and bounded values, displayed for review before Apply; no code from the model is executed. Provider CORS, billing and retention apply. The free image workflow needs no connection.
+
+`scripts/mcp-server.ts` runs separately in a local Node process using the official SDK. It exposes style listing, PNG analysis, local command planning and real PNG rendering using the same engine. Canonical path checks keep reads and output parents inside a supplied working root; exclusive file creation refuses overwrites. There is no remote MCP endpoint or server-side browser photo storage. See [MCP.md](MCP.md) and [HANDOFF.md](../HANDOFF.md).
+
+The build emits two HTML entry points: the interactive studio and a JavaScript-independent guide. Both are linked and included in the public-asset cache. Search metadata and a sitemap describe the actual application; no ranking guarantee is inferred from their existence.
+
+## Core photo path
+
 The production application is a static TypeScript application built with Vite. The host serves the interface, code, fonts, and a labeled demonstration photo. User-selected photo bytes remain in browser memory; the core processing and export path needs no service credentials, model download, Python process, or remote inference endpoint.
 
 ```mermaid

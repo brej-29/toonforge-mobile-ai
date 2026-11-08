@@ -1,5 +1,7 @@
 # Image engine evaluation
 
+The narrative runtime below preserves the original 2026-11-05 measurement. The 2026-11-08 rerun in [evaluation-results.json](evaluation-results.json) passes the same signal thresholds, with an engine-only median of 104.28 ms on the recorded Windows/i5 machine. It excludes image decoding, source analysis, worker startup and export; it is not a browser/phone performance result.
+
 Run `npm run evaluate` to reproduce this report and [the raw JSON](evaluation-results.json). The [evaluation plan](EVALUATION_PLAN.md) was written locally before implementing the engine; it is not an externally registered study. Result: **all engineering thresholds passed**.
 
 ## Experiment
@@ -26,7 +28,7 @@ The production method weakens the low-contrast one-pixel line. The input line co
 
 ## Runtime and invariants
 
-One warm-up, then five runs: 79.71, 83.60, 98.44, 100.93, 101.38 ms. Median **98.44 ms**, range 79.71–101.38 ms; threshold below 2,000 ms. Environment: v24.17.0, win32/x64, 13th Gen Intel(R) Core(TM) i5-13450HX. Timing is a local result, not a phone benchmark; rerunning changes timing but must preserve the signal results.
+One warm-up, then five runs: 90.30, 177.44, 104.28, 88.20, 159.19 ms. Median **104.28 ms**, range 88.20–177.44 ms; threshold below 2,000 ms. Environment: v24.17.0, win32/x64, 13th Gen Intel(R) Core(TM) i5-13450HX. Timing is a local result, not a phone benchmark; rerunning changes timing but must preserve the signal results.
 
 `npm test` checks deterministic output bytes, all presets, unchanged input, exact dimensions and alpha, monochrome equality, single-pixel boundaries, transparent-neighbor handling, outline monotonicity, invalid input rejection, and both fixed signal targets. The engine caps work at four million pixels and rejects invalid dimensions and parameter values.
 

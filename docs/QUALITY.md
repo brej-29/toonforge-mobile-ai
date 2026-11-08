@@ -1,5 +1,7 @@
 # Quality and release evidence
 
+This document preserves the 2026-11-05 release history and its measurements. Current 2.1 tests and release status are recorded separately in [RELEASE_2_1.md](RELEASE_2_1.md). Earlier Lighthouse values below are not asserted for the expanded workbench until remeasured.
+
 ## Acceptance checks
 
 Ten core tests cover deterministic processing, exact buffer and alpha invariants, presets, outlines, invalid parameters, image header guards, output bounds, filenames, and both synthetic targets. Seven browser tests cover real PNG export/re-import, printing, settings, empty/error/slow states, offline reload, and automated AA checks at phone (390×844), tablet (768×1024), and desktop (1440×1000).

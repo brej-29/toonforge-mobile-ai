@@ -2,6 +2,9 @@ import './style.css';
 import { PRESETS } from './lib/presets';
 import type { PixelImage, ProcessedImage, ProcessingOptions } from './lib/processing';
 import { inspectRaster, outputDimensions, exportName, MAX_FILE_BYTES } from './lib/import';
+import { createWorkbench } from './workbench';
+import type { ImageAnalysis } from './lib/analysis';
+import { validateOptions } from './lib/recipes';
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const original = $<HTMLCanvasElement>('original');
@@ -9,6 +12,7 @@ const canvas = $<HTMLCanvasElement>('result');
 const file = $<HTMLInputElement>('file');
 const detail = $<HTMLInputElement>('detail');
 const ink = $<HTMLInputElement>('ink');
+const colors = $<HTMLInputElement>('colors');
 const wipe = $<HTMLInputElement>('wipe');
 const download = $<HTMLButtonElement>('download');
 const print = $<HTMLButtonElement>('print');
@@ -28,6 +32,13 @@ let timeout: ReturnType<typeof setTimeout>;
 let toastTimer: ReturnType<typeof setTimeout>;
 let worker: Worker | undefined;
 let printUrl = '';
+const currentOptions = (): ProcessingOptions => ({ preset, detail: +detail.value, ink: +ink.value, colors: +colors.value });
+const workbench = createWorkbench(currentOptions, options => {
+  const next = validateOptions(options); preset = next.preset;
+  detail.value = String(next.detail); ink.value = String(next.ink); colors.value = String(next.colors);
+  document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.preset === preset)));
+  updateValues(); clearTimeout(debounce); process();
+});
 
 function context(target: HTMLCanvasElement) {
   const ctx = target.getContext('2d', { willReadFrequently: target === original });
@@ -58,12 +69,13 @@ function setBusy(busy: boolean, label = 'Drawing your illustration…') {
 function createWorker() {
   const currentWorker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
   worker = currentWorker;
-  currentWorker.onmessage = (event: MessageEvent<{id: number; result?: ProcessedImage; error?: string}>) => {
+  currentWorker.onmessage = (event: MessageEvent<{id: number; result?: ProcessedImage; analysis?: ImageAnalysis; error?: string}>) => {
     if (event.data.id !== generation) return;
     if (event.data.error || !event.data.result) {
       setBusy(false); showError(event.data.error || 'Processing failed. Try another style or a smaller photo.'); return;
     }
     processed = event.data.result;
+    workbench.setAnalysis(event.data.analysis);
     resultPreset = preset; resultName = name;
     canvas.width = processed.width; canvas.height = processed.height;
     context(canvas).putImageData(new ImageData(new Uint8ClampedArray(processed.data), processed.width, processed.height), 0, 0);
@@ -94,7 +106,7 @@ function process() {
   const pixels = new Uint8ClampedArray(source.data);
   try {
     createWorker();
-    worker!.postMessage({ id: generation, image: { ...source, data: pixels }, options: { preset, detail: +detail.value, ink: +ink.value } }, [pixels.buffer]);
+    worker!.postMessage({ id: generation, image: { ...source, data: pixels }, options: currentOptions() }, [pixels.buffer]);
   } catch { setBusy(false); showError('Your browser cannot start the local image worker. Try a current browser or reload the page.'); return; }
   timeout = setTimeout(() => { generation++; worker?.terminate(); setBusy(false); showError('This photo took too long on your device. Try a smaller image or reload to free memory.'); }, 30_000);
 }
@@ -102,11 +114,12 @@ function selectPreset(id: ProcessingOptions['preset']) {
   preset = id;
   const style = PRESETS.find(p => p.id === id)!;
   detail.value = String(style.defaultDetail); ink.value = String(style.defaultInk);
+  colors.value = String(style.levels);
   updateValues();
   document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.preset === id)));
   clearTimeout(debounce); process();
 }
-function updateValues() { $('detail-value').textContent = detail.value; $('ink-value').textContent = ink.value; }
+function updateValues() { $('detail-value').textContent = detail.value; $('ink-value').textContent = ink.value; $('colors-value').textContent = colors.value; }
 async function openBlob(blob: Blob, filename: string, sample: boolean, token: number) {
   if (blob.size > MAX_FILE_BYTES) throw new Error('This file is over 20 MB. Save a smaller JPG, PNG or WebP and try again.');
   inspectRaster(new Uint8Array(await blob.slice(0, 1024 * 1024).arrayBuffer()));
@@ -120,6 +133,7 @@ async function openBlob(blob: Blob, filename: string, sample: boolean, token: nu
     const image = ctx.getImageData(0, 0, size.width, size.height);
     source = { width: size.width, height: size.height, data: image.data };
     processed = undefined; name = filename; revealNext = true; frame.classList.remove('has-result');
+    workbench.setAnalysis();
     canvas.width = size.width; canvas.height = size.height;
     $('filename').textContent = filename; $('filename').title = filename;
     $('dimensions').textContent = `${size.width} × ${size.height}`;
@@ -148,6 +162,7 @@ async function loadSample() {
 function clearPhoto() {
   loadGeneration++; generation++; clearTimeout(debounce); worker?.terminate(); source = undefined; processed = undefined;
   frame.classList.remove('has-result'); revealNext = false;
+  workbench.setAnalysis();
   original.width = original.height = canvas.width = canvas.height = 1;
   if (printUrl) URL.revokeObjectURL(printUrl); printUrl = '';
   $('print-image-slot').replaceChildren();
@@ -163,7 +178,7 @@ function asBlob(): Promise<Blob> {
 }
 
 document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(button => button.addEventListener('click', () => selectPreset(button.dataset.preset as ProcessingOptions['preset'])));
-for (const input of [detail, ink]) input.addEventListener('input', () => { updateValues(); clearTimeout(debounce); download.disabled = true; print.disabled = true; debounce = setTimeout(process, 180); });
+for (const input of [detail, ink, colors]) input.addEventListener('input', () => { updateValues(); clearTimeout(debounce); download.disabled = true; print.disabled = true; debounce = setTimeout(process, 180); });
 wipe.addEventListener('input', () => { for (const element of [$('result-clip'),$('wipe-seam')]) element.getAnimations().forEach(a=>a.cancel()); frame.style.setProperty('--wipe', `${wipe.value}%`); });
 document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button => button.addEventListener('click', () => { frame.dataset.view = button.dataset.view; document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b === button))); }));
 frame.dataset.view = 'compare';
@@ -200,6 +215,20 @@ print.addEventListener('click', async () => {
 });
 function updateConnection() { $('connection').hidden = navigator.onLine; }
 window.addEventListener('online', updateConnection); window.addEventListener('offline', updateConnection); updateConnection();
-try { selectPreset('soft-print'); void loadSample(); }
+try { selectPreset('soft-print'); workbench.readHash(); void loadSample(); }
 catch { setBusy(false); showError('Your browser cannot start the local editor. Try a current version of Chrome, Firefox, Edge or Safari.'); $('empty-state').hidden = false; }
 if (import.meta.env.PROD && 'serviceWorker' in navigator) window.addEventListener('load', () => { void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => { /* The online editor remains usable when offline caching is unavailable. */ }); });
+
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+function setMotion(paused: boolean) {
+  document.body.classList.toggle('motion-paused', paused);
+  $('motion-toggle').setAttribute('aria-pressed', String(paused));
+  $('motion-toggle').textContent = paused ? 'Enable background motion' : 'Pause background motion';
+}
+setMotion(motionPreference.matches);
+motionPreference.addEventListener('change', event => setMotion(event.matches));
+$('motion-toggle').addEventListener('click', () => setMotion(!document.body.classList.contains('motion-paused')));
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => entry.target.classList.toggle('in-view', entry.isIntersecting)), { threshold: .15 });
+  document.querySelectorAll('.process-section,.workbench').forEach(section => observer.observe(section));
+}

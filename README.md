@@ -1,41 +1,93 @@
+<div align="center">
+
 # Toonforge
 
-**A private photo-to-print studio.** Open a photo, simplify it into comic artwork, compare the result, and download a PNG or print a sheet. Deterministic image filters run on your device.
+### Your photos. Your process. Your next print.
 
-[Open the studio](https://brej-29.github.io/toonforge-mobile-ai/) · [Why this exists and 15 hard questions](docs/WHY.md) · [Evaluation](docs/EVALUATION.md)
+A free, private **photo-to-cartoon and print studio** for zines, classroom handouts and everyday artwork. Local computer vision does the pixel work. Optional text models help you direct it.
 
-## Problem and evidence
+[**Open the studio →**](https://brej-29.github.io/toonforge-mobile-ai/) · [Guide](https://brej-29.github.io/toonforge-mobile-ai/guide.html) · [Portfolio handoff](HANDOFF.md) · [MCP tools](docs/MCP.md)
 
-The working audience is teachers, workshop facilitators, and makers preparing illustrated handouts or small prints from their own photos. The hypothesis is that a focused local workflow helps when a full editor is too much and uploading the photo is undesirable. **Demand and a usability advantage are unvalidated.** Photopea already offers local editing; privacy alone is not a differentiator.
+[![Studio checks](https://github.com/brej-29/toonforge-mobile-ai/actions/workflows/studio.yml/badge.svg)](https://github.com/brej-29/toonforge-mobile-ai/actions/workflows/studio.yml)
+[![License: MIT](https://img.shields.io/badge/code-MIT-26234c.svg)](LICENSE)
+![Processing: on device](https://img.shields.io/badge/image_processing-on_device-5146ba)
+![Account: not required](https://img.shields.io/badge/account-not_required-f7d96c?labelColor=26234c)
 
-The original Flutter/Streamlit/FastAPI/Gradio stack supplied concrete failure evidence: **5 API tests passed**, yet real requests produced **0 PNG outputs in 2 mode attempts**. Local inference lacked a model; the cloud adapter lacked configuration. Its happy-path test returned mocked bytes instead of a decodable image. [The baseline audit](docs/BASELINE.md) records installation commands and observed responses.
+[![Toonforge showing a real original/result comparison](docs/assets/studio.png)](https://brej-29.github.io/toonforge-mobile-ai/)
 
-## Approach
+</div>
 
-The production path is one static TypeScript/Vite application with Canvas and a processing worker. Range-weighted smoothing reduces texture, tone quantization simplifies shading, and Sobel gradients add outlines. There is no image API, model download, secret, or account.
+## Make something worth coming back for
 
-The studio includes three styles, texture/outline controls, a keyboard-operable comparison wipe, original/result views, transparent PNG export, printing, and live runtime/darkness measurements. It handles empty/error/slow states and works offline after caching public assets. A licensed sample is labeled and processed live. [Architecture](docs/architecture.md) · [Sources](docs/SOURCES.md)
+Open your photo, find a look, save its recipe, and use it again next week. There is no image-upload service, model download or mandatory account. A labeled sample lets you try the full workflow immediately.
 
-The previous stack is preserved in [legacy/](legacy/) and git history; it is excluded from deployment. Backup tags preserve both the original checked-out commit and the fetched default branch.
+| Your project | A useful starting point |
+| --- | --- |
+| Classroom handout or workshop | Simplify texture, soften outlines, inspect details, print a sheet |
+| Zine or comic artwork | Try Graphic novel, reduce tone levels, compare edges, export PNG |
+| A quiet memory print | Try Soft print or soft monochrome, preserve more shading |
+| Repeatable visual style | Save named settings or share a settings-only link |
+| Agent-assisted PNG processing | Connect local MCP to analyze and render files in a chosen folder |
 
-## Targets and results
+![Animated comparison of actual local filter output](docs/assets/comparison.gif)
 
-The [plan](docs/EVALUATION_PLAN.md) was written locally before engine implementation. Acceptance: at least 50% lower flat-region noise than plain posterization; at least 90% clean boundary contrast retention; better boundary retention than box smoothing; preserved pixel invariants; median 512×512 runtime below 2 seconds.
+*Actual filter output. Sample: Green Liu / Unsplash; [license](docs/SOURCES.md). A [static screenshot](docs/assets/studio.png) is available instead of animation.*
 
-| Controlled measurement | Posterize | Box smoothing | Edge-aware |
+## An inspectable image engine
+
+- **Three looks:** Soft print, Graphic novel and Mono ink; texture, outline and 3–12 tone-level controls.
+- **Live comparison:** draggable wipe and explicit original/result views, PNG download and browser print sheets.
+- **Image analysis:** alpha-weighted luminance histogram, tonal standard deviation and local transition density; explicit heuristics suggest settings.
+- **Text direction:** free local command rules and an optional user-supplied text-model endpoint, key and model ID. Review plans before Apply.
+- **Recipe shelf:** twelve named looks in local storage; shared links contain settings, never photos or keys.
+- **Local MCP:** four tools share the production engine, with bounded PNG reads/writes and overwrite protection.
+- **Practical UI:** responsive layouts, keyboard access, announcements, reduced motion, pauseable background motion and offline asset caching.
+
+![Image analysis, text direction and recipe shelf](docs/assets/workbench.png)
+
+## Can a text-only model change an image?
+
+**It can direct supported edits indirectly.** A text model turns an instruction into JSON settings. Toonforge validates the plan, shows it for review, and runs image filters locally after Apply. The model does not see the photo or produce pixels. Object removal, background replacement and generative reimagining require capabilities this release does not include.
+
+For OmniRoute or another chat-completions-compatible router, enter your API base URL, model ID and key. The provider must allow browser CORS. One request sends your instruction, current settings and three numeric measurements. Output is capped at 220 tokens, with a 20-second timeout and no automatic retries. Keys stay in tab memory; provider billing and retention still apply. **No real paid key was used to verify this release**; provider boundaries are tested with mocked responses. [Setup and limits](https://brej-29.github.io/toonforge-mobile-ai/guide.html#text)
+
+```mermaid
+flowchart LR
+    A[Local JPG / PNG / WebP] --> B[Validate header & dimensions]
+    B --> C[Canvas decode: at most 1.5 MP]
+    C --> W[Web Worker]
+    W --> D[Range-weighted smoothing]
+    D --> E[Tone quantization]
+    E --> F[Sobel outlines]
+    W --> H[Histogram & contrast analysis]
+    F --> P[Compare / PNG / print]
+    H --> R[Suggested recipe]
+    T[Instruction + settings + 3 measurements] -. optional .-> M[User's text provider]
+    M -. validated JSON .-> R
+    R --> U[Review and apply]
+    U --> W
+    S[Saved / shared settings] --> U
+```
+
+## What changed, and what is proven?
+
+The original Flutter / FastAPI / Streamlit / Gradio project passed five API tests, but audited real requests returned **zero valid PNGs across two inference modes**: missing local weights and missing cloud configuration. Its successful test mocked output bytes. [Baseline evidence](docs/BASELINE.md)
+
+The deployed path produces real decodable PNGs without inference infrastructure. The earlier stack is preserved under [legacy/](legacy/). The engine is tested against simpler alternatives.
+
+| Synthetic measurement | Posterize | Box smoothing | Edge-aware |
 | --- | ---: | ---: | ---: |
-| Flat-region std, seed 29 | 30.11 | 0.00 | 0.00 |
-| Flat-region std, seed 71 | 30.19 | 0.00 | 0.00 |
+| Flat-region std, seeds 29 / 71 | 30.11 / 30.19 | 0 / 0 | 0 / 0 |
 | Boundary contrast, seeds 29 / 71 | 116 / 117 | 63 / 63 | 127 / 127 |
 | Thin-line contrast, seeds 29 / 71 | 44.33 / 42.67 | 0.67 / 2.00 | 23.33 / 23.33 |
 
-All declared engineering thresholds pass. The clean boundary contrast is 120: 127 is **quantization overshoot**, not extra information. The low-contrast line weakens from 29.73/28.38 in the noisy input to 23.33. Inspect small text, hair, faces, and foliage before exporting.
+The clean boundary contrast is 120: **127 is quantization overshoot**, not new detail. Low-contrast thin lines weaken. Two controlled targets establish neither artistic preference, printer savings nor product demand. Latest local engine-only timings are in [raw results](docs/evaluation-results.json), not an end-to-end phone benchmark. [Plan](docs/EVALUATION_PLAN.md) · [Negative findings](docs/EVALUATION.md)
 
-The checked-in local run's median is **98.44 ms**, five measured runs after warm-up on an i5-13450HX. This is not a phone benchmark. [Results and raw timings](docs/EVALUATION.md) include negative findings; `npm run evaluate` regenerates them, with naturally different runtimes. Synthetic fixtures prove neither artistic quality, toner savings, nor user preference.
+This is **classical computer vision plus an optional language-model control layer**. No trained neural image model is included. [Portfolio claims and boundaries](HANDOFF.md)
 
-## Run and verify
+## Run locally
 
-Node.js 24 and npm; no service credentials or environment variables.
+Node.js 24 and npm. The image editor needs no credentials.
 
 ```sh
 npm ci
@@ -43,31 +95,33 @@ npm run dev
 ```
 
 ```sh
-npm test
-npm run evaluate
-npm run build
+npm test                 # engine, imports, analysis, recipes, provider boundaries, real MCP
+npm run evaluate        # reproducible synthetic comparisons
+npm run build           # type checks, both pages, versioned offline cache
 npx playwright install chromium
-npm run test:e2e
+npm run test:e2e         # real export/re-import, print, offline, workbench and AA checks
 ```
 
-Use `npm.cmd` / `npx.cmd` on PowerShell if script execution is disabled. Browser tests start a strict-port preview on 127.0.0.1:4399. For a deployed check, set `LIVE_URL` to the HTTPS address and run `npm run smoke`.
+Use `npm.cmd` / `npx.cmd` on PowerShell if needed. Browser tests start a strict-port preview on `127.0.0.1:4399`; `LIVE_URL` can target an existing preview. `npm run smoke` requires a deployed HTTPS `LIVE_URL`.
 
-Ten core tests cover pixel invariants, image header validation, output bounds, safe filenames, and declared signal thresholds. Seven browser tests exercise real PNG download/re-import, controls, printing, invalid input, empty/slow states, offline reload, and automated AA checks at 390, 768, and 1440 pixels. CI attaches screenshots and evaluation JSON for seven days. [Quality evidence](docs/QUALITY.md)
+For agents: `npm run mcp -- --root /absolute/path/to/images`. [MCP configuration and example calls](docs/MCP.md)
 
-## Deployment and limits
+## Deployment, search and practical limits
 
-**Live and verified:** https://brej-29.github.io/toonforge-mobile-ai/ . Publication runs from `main` through `.github/workflows/studio.yml`, after type checks, tests, evaluation, build, and browser checks pass. [The release run](https://github.com/brej-29/toonforge-mobile-ai/actions/runs/41978393522) passed verification, deployment, and the public PNG export/decode smoke test on 2026-11-05. Fresh public checks at phone, tablet, and desktop widths found no automated AA violations or horizontal overflow. Live Lighthouse: **90 performance / 100 accessibility / 100 best practices / 100 SEO**. [Recorded evidence](docs/release-verification.json)
+**Public studio:** https://brej-29.github.io/toonforge-mobile-ai/
 
-[GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits): eligible public repositories on the free plan; 1 GB maximum site; soft 100 GB bandwidth/month; ten-minute deployment timeout; host rate limiting can return 429. This is a free open-source utility without commercial transactions or a commercial SaaS service. No new account, card, or paid tier is required. No inference cold start or model quota exists; outages still prevent an uncached first visit.
+GitHub Actions checks the application before publishing `main` to Pages, then downloads and decodes a public PNG. [Workflow](.github/workflows/studio.yml) · [2.1 release evidence](docs/RELEASE_2_1.md)
 
-Offline reload requires completed public-asset caching. Storage eviction, private browsing, or a first visit without internet can prevent it. Updates may activate on a subsequent visit/reload. Hosting sees ordinary page requests; selected photos are not transmitted by the editor.
+Search support includes static content, a useful guide, canonical URLs, social previews, truthful application JSON-LD, a [sitemap](https://brej-29.github.io/toonforge-mobile-ai/sitemap.xml) and an optional [machine-readable index](https://brej-29.github.io/toonforge-mobile-ai/llms.txt). Ranking and AI recommendations are not guaranteed. Search Console verification/submission remains an owner follow-up. [SEO details](docs/SEO.md)
 
-JPG/PNG/WebP inputs: up to 20 MiB, 40 million source pixels, and 20,000 pixels per side. Output downsamples to at most 1.5 million pixels and 8,192 per side, without upscaling. This suits small prints/web artwork rather than high-resolution posters. Browser memory and decoding can still fail. There is no saved gallery; reloading discards a selected photo. Image darkness is a screen statistic, not measured printer ink usage. Processing does not anonymize a subject.
+Browser input: JPG/PNG/WebP up to 20 MiB, 40 million source pixels and 20,000 pixels per side. Working output: **at most 1.5 MP**, no upscaling. MCP: PNG only, 4 MP / 8,192 pixels per side. These bounds suit small prints and web artwork, not large posters. Browser memory can still fail. Image darkness is a screen statistic, not printer consumption. Filtering does not anonymize people.
 
-## Documentation and licensing
+Photos live in tab memory and disappear on reload. Only recipe settings persist. Offline use needs completed first-visit caching; storage eviction may prevent it. Text calls need a connection. The host sees page traffic; the chosen provider sees explicitly requested text traffic. No analytics or photo server is included.
 
-- [WHY: alternatives, tradeoffs, falsification, and 15 questions](docs/WHY.md)
-- [Original failure evidence](docs/BASELINE.md), [evaluation plan](docs/EVALUATION_PLAN.md), [results](docs/EVALUATION.md)
-- [Product assumptions](PRODUCT.md), [design system](DESIGN.md), [quality evidence](docs/QUALITY.md)
+## Project notes
 
-Code: MIT. The sample is by Green Liu under the [Unsplash License](https://unsplash.com/license), separately credited in [SOURCES.md](docs/SOURCES.md). Bundled Manrope fonts use the SIL Open Font License, included in public/FONT-LICENSE.txt.
+[**HANDOFF.md — product story, architecture, challenges, CV bullets, LinkedIn drafts and roadmap**](HANDOFF.md)
+
+[Why](docs/WHY.md) · [Architecture](docs/architecture.md) · [Quality history](docs/QUALITY.md) · [2.1 checks](docs/RELEASE_2_1.md) · [Product](PRODUCT.md) · [Design](DESIGN.md) · [Sources](docs/SOURCES.md)
+
+Code: [MIT](LICENSE). The bundled photo and its GIF/screenshot derivatives retain the [Unsplash License](https://unsplash.com/license). Manrope uses the SIL Open Font License, included in `public/FONT-LICENSE.txt`.

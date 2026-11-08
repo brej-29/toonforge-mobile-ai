@@ -1,5 +1,7 @@
 # Sources, assets, and comparison criteria
 
+2.1 additions (2026-11-08): [MCP server guide](https://modelcontextprotocol.io/docs/develop/build-server), [Google AI search guidance](https://developers.google.com/search/docs/appearance/ai-features), [JavaScript SEO](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics), and [software application structured data](https://developers.google.com/search/docs/appearance/structured-data/software-app). The current interface adds native CSS view-timeline enhancement, a CSS pipeline signal and background motion with a pause control; the component-choice discussion below describes the earlier release. README captures/GIF and `public/social-preview.png` derive from the actual app and the separately licensed Green Liu sample. Reproduce with `scripts/capture-docs.mjs` and `scripts/make-demo.py`; they are not generative image assets.
+
 Sources checked 2026-11-05. Claims below describe the linked products' published behavior, not a hands-on comparative benchmark. There is no user survey, adoption estimate, or measured market-size claim.
 
 ## Product evidence and alternatives
