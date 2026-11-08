@@ -1,0 +1,11 @@
+# Toonforge
+
+> Free, open-source, private photo-to-cartoon and print studio. Classical image filters execute locally in a browser worker. Optional text models propose settings; they do not see photos or generate pixels.
+
+- [Studio](https://brej-29.github.io/toonforge-mobile-ai/): JPG/PNG/WebP import, three styles, texture/outline/tone controls, comparison, PNG export and browser printing.
+- [Guide](https://brej-29.github.io/toonforge-mobile-ai/guide.html): workflows, methods, privacy, text-model setup, MCP and limitations.
+- [Source](https://github.com/brej-29/toonforge-mobile-ai): MIT-licensed implementation, tests and deployment workflow.
+- [Evaluation](https://github.com/brej-29/toonforge-mobile-ai/blob/main/docs/EVALUATION.md): controlled synthetic comparisons; not an artistic-quality or user-adoption study.
+- [MCP](https://github.com/brej-29/toonforge-mobile-ai/blob/main/docs/MCP.md): optional local stdio server; no public remote endpoint.
+
+Photos stay on the user's device. Saved recipes contain settings only. Optional user-configured text requests send the instruction, settings and three aggregate measurements directly to that provider. Browser output is limited to 1.5 MP. No trained neural image model, object removal, anonymity guarantee, or measured printer-ink saving is claimed.

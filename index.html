@@ -4,10 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#e9e8fa" />
-  <meta name="description" content="Turn your photos into comic artwork and printable sheets. A free, private photo studio that processes every image on your device." />
-  <meta property="og:title" content="Toonforge — A little less photo. A little more story." />
-  <meta property="og:description" content="Make illustrated artwork from a photo. Three styles, a live comparison, and local PNG export. Your photos stay yours." />
-  <title>Toonforge — Your private comic print studio</title>
+  <meta name="description" content="Free photo to cartoon and print studio. Make comic artwork, zines and classroom handouts locally. Analyze images, save recipes and direct filters with text." />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <link rel="canonical" href="https://brej-29.github.io/toonforge-mobile-ai/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://brej-29.github.io/toonforge-mobile-ai/" />
+  <meta property="og:title" content="Toonforge — Private photo to cartoon & print studio" />
+  <meta property="og:description" content="Your photos become comic prints, zines and handouts. Local image processing, reusable recipes and optional text-model direction." />
+  <meta property="og:image" content="https://brej-29.github.io/toonforge-mobile-ai/social-preview.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Toonforge photo-to-print studio showing original and illustrated Manarola" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Toonforge — Private photo to cartoon & print studio" />
+  <meta name="twitter:description" content="Local photo filters, image analysis and recipes for your next zine, comic print or classroom handout." />
+  <meta name="twitter:image" content="https://brej-29.github.io/toonforge-mobile-ai/social-preview.png" />
+  <title>Toonforge — Free Photo to Cartoon & Print Studio</title>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Toonforge","url":"https://brej-29.github.io/toonforge-mobile-ai/","description":"A free private photo-to-cartoon and print studio with local image analysis, reusable recipes and optional text-directed filter settings.","applicationCategory":"MultimediaApplication","operatingSystem":"Web browser","browserRequirements":"JavaScript, Canvas and Web Workers","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"featureList":["Local photo processing","Comic and monochrome filters","PNG export and print sheets","Image histogram and contrast analysis","Saved and shareable recipes","Optional user-supplied text model"],"sameAs":"https://github.com/brej-29/toonforge-mobile-ai","license":"https://opensource.org/license/mit"}</script>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   <link rel="manifest" href="./manifest.webmanifest" />
 </head>
@@ -15,12 +28,13 @@
   <a class="skip" href="#studio">Skip to the studio</a>
   <header class="site-header">
     <a class="wordmark" href="./" aria-label="Toonforge home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 5h22v17H17l-7 6v-6H5z"/><path d="M10 11h12M10 16h8"/></svg>toonforge<span class="brand-note">PHOTO / PRINT STUDIO</span></a>
-    <nav aria-label="Main navigation"><a href="#about">Why this exists</a><a href="https://github.com/brej-29/toonforge-mobile-ai" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">↗</span></a></nav>
+    <nav aria-label="Main navigation"><a href="#workbench">Recipes & direction</a><a href="./guide.html">How it works</a><a href="https://github.com/brej-29/toonforge-mobile-ai" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">↗</span></a></nav>
   </header>
+  <div class="print-orbits" aria-hidden="true"><i></i><i></i><i></i></div>
   <main>
     <section class="intro" aria-labelledby="title">
-      <h1 id="title">A little less photo.<br><span>A little more story.</span></h1>
-      <div class="intro-copy"><p>Turn everyday photos into illustrated moments. <br>Make a handout, a print, or something just for you.</p><p class="local-promise"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="m8 12 3 3 5-6"/></svg>Private by design. Your photo stays here.</p></div>
+      <h1 id="title">A photo.<br><span>A hundred possibilities.</span></h1>
+      <div class="intro-copy"><p>Your free photo-to-cartoon & print studio.<br>Make a zine. Teach a class. Print a memory.<br>Find a look worth coming back to.</p><p class="local-promise"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="m8 12 3 3 5-6"/></svg>Your photo stays on your device.</p></div>
     </section>
     <div class="connection" id="connection" hidden>You're offline. Your loaded photo still works. Sample images need to be cached first.</div>
     <section class="studio" id="studio" aria-label="Photo illustration studio">
@@ -44,14 +58,40 @@
           <button class="style-option" data-preset="mono-ink" aria-pressed="false"><span class="swatch swatch-mono" aria-hidden="true"><i></i><i></i><i></i></span><span><strong>Mono ink</strong><small>Four tones, print-ready</small></span><span class="style-check" aria-hidden="true"></span></button>
         </div>
         <div class="adjustments"><div class="label-row"><label for="detail">Texture detail</label><output for="detail" id="detail-value">45</output></div><input id="detail" type="range" min="0" max="100" value="45"/><div class="range-caption"><span>Simpler</span><span>More texture</span></div><div class="label-row"><label for="ink">Outline strength</label><output for="ink" id="ink-value">35</output></div><input id="ink" type="range" min="0" max="100" value="35"/><div class="range-caption"><span>Softer</span><span>Bolder</span></div><button class="text-button reset" id="reset">Reset this style</button></div>
+        <div class="tones-control"><div class="label-row"><label for="colors">Tone levels per channel</label><output for="colors" id="colors-value">7</output></div><input id="colors" type="range" min="3" max="12" value="7"/><div class="range-caption"><span>Poster-like</span><span>Subtle shading</span></div></div>
         <div class="export-block"><button class="primary" id="download" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg>Download PNG</button><button class="print-button" id="print" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7zM17 11h1"/></svg>Print a sheet</button><p id="export-note">No watermark. No sign-up.</p></div>
       </aside>
       <div class="metrics-strip" aria-label="Live measurements"><div><span class="metric-dot"></span><strong id="status">Getting ready</strong></div><div><span>Processing</span><strong id="metric-time">—</strong></div><div><span>Image darkness</span><strong id="metric-ink">—</strong></div><div><span>Image uploads</span><strong>0 bytes</strong></div><button id="clear" class="text-button" disabled>Clear photo</button></div>
     </section>
     <p class="studio-hint">Drag the divider to see the difference.<span>JPG, PNG or WebP · up to 20 MB · exports up to 1.5 MP</span></p>
+    <section class="workbench" id="workbench" aria-labelledby="workbench-title">
+      <div class="section-heading"><h2 id="workbench-title">Make it your process.</h2><p>Find the settings once. Make them yours for the next photo.</p></div>
+      <div class="workbench-grid">
+        <div class="direction-panel">
+          <h3>Describe the look.</h3><p class="help">Start with local commands, or connect your own text model for more flexible wording.</p>
+          <form id="direction-form"><label for="direction">What would you like to change?</label><textarea id="direction" maxlength="600" rows="2" placeholder="Softer outlines, less texture, fewer colors"></textarea>
+          <div class="command-examples" aria-label="Example edits"><button type="button" data-command="Monochrome with softer outlines">Soft monochrome</button><button type="button" data-command="Bold comic with fewer colors">Bold comic</button><button type="button" data-command="Simpler handout with gentle outlines">Classroom handout</button></div>
+          <div class="direction-actions"><button class="primary" id="plan-local" type="submit">Plan a local edit</button><button class="secondary" id="plan-model" type="button">Use my text model</button><button id="cancel-model" class="text-button" type="button" hidden>Cancel request</button></div></form>
+          <div id="plan-preview" class="plan-preview" hidden><h4>Proposed settings</h4><p id="plan-settings" class="settings-readout"></p><p id="plan-explanation"></p><button class="secondary" id="apply-plan">Apply these settings</button></div>
+          <p id="direction-status" class="help" role="status">Local commands are rule based. No API key needed.</p>
+          <details class="model-connection" id="model-connection"><summary>Connect a text model (optional)</summary><p class="help">Only your instruction, current settings and three numeric image measurements go to the provider you choose. Your photo and filename stay here. Your provider receives your key and may charge for tokens.</p>
+            <label for="model-url">API base URL</label><input id="model-url" type="url" placeholder="https://your-router.example/v1" autocomplete="off" spellcheck="false" />
+            <div class="model-fields"><div><label for="model-id">Text model ID</label><input id="model-id" maxlength="150" placeholder="Your model ID" autocomplete="off" spellcheck="false" /></div><div><label for="model-key">API key</label><input id="model-key" type="password" autocomplete="off" placeholder="Kept in this tab only" /></div></div>
+            <p class="help">One request, at most 220 output tokens, 20-second timeout, no automatic retries. The provider must allow browser CORS. A text model proposes filters; it cannot see the photo or generate new image content.</p><button id="disconnect-model" type="button" class="text-button">Clear connection details</button>
+          </details>
+        </div>
+        <section class="analysis-panel" aria-labelledby="analysis-title"><div class="panel-title"><h3 id="analysis-title">Read the image.</h3><span id="analysis-tag">Waiting for pixels</span></div>
+          <figure class="histogram-figure"><canvas id="histogram" width="640" height="140" role="img" aria-label="Luminance distribution from dark to light; measurements below"></canvas><figcaption><span>Shadows</span><span>Luminance distribution</span><span>Highlights</span></figcaption></figure>
+          <dl class="analysis-values"><div><dt>Mean luminance</dt><dd id="analysis-mean">—</dd></div><div><dt>Tonal contrast (σ)</dt><dd id="analysis-contrast">—</dd></div><div><dt>Local transitions</dt><dd id="analysis-edges">—</dd></div></dl>
+          <p id="analysis-advice" class="help">Open a photo to inspect its tonal range and texture.</p><button id="auto-tune" class="secondary" disabled>Try suggested settings</button><p class="micro">Measured from the working image. Suggestions are heuristics, not learned predictions.</p>
+          <details class="recipe-library" open><summary>Your recipe shelf <span id="recipe-count">0 / 12</span></summary><div class="save-recipe"><label class="sr-only" for="recipe-name">Recipe name</label><input id="recipe-name" maxlength="60" placeholder="Give this look a name" /><button id="save-recipe" class="secondary">Save settings</button></div><p id="shelf-empty" class="help">Save a look for your next project. Only settings are stored on this device.</p><ul id="recipe-list"></ul><button id="share-recipe" class="text-button">Copy a link to these settings</button><p id="shelf-status" class="help" role="status"></p><input id="share-link" class="share-link" readonly aria-label="Recipe link to copy" hidden /></details>
+        </section>
+      </div>
+    </section>
+    <section class="process-section" aria-labelledby="process-title"><div><h2 id="process-title">Words guide.<br>Pixels stay here.</h2><p>Your settings guide an inspectable image pipeline. Smoothing, shading and outlines run on your device, keeping the work close to the photo.</p><a href="./guide.html">Explore the method and its limits <span aria-hidden="true">↗</span></a></div><ol class="pipeline" aria-label="Local processing pipeline"><li><strong>Analyze</strong><span>Luminance · contrast · texture</span></li><li><strong>Smooth</strong><span>Range-weighted, edge-aware</span></li><li><strong>Simplify</strong><span>3–12 tone levels per channel</span></li><li><strong>Outline</strong><span>Sobel gradients · soft threshold</span></li><li><strong>Make it real</strong><span>PNG · print · reusable recipe</span></li></ol></section>
     <section class="about" id="about" aria-labelledby="about-title"><div class="about-story"><h2 id="about-title">Good ideas shouldn't<br>need an upload.</h2><p>A classroom handout. A zine about your neighbourhood. A print of a favourite place. Sometimes you need a simpler image, without a whole design suite.</p><p>Toonforge keeps the photo and the work on your device. It simplifies texture and draws outlines with predictable image filters. It doesn't invent details, and it isn't an anonymity tool.</p><a href="https://github.com/brej-29/toonforge-mobile-ai/blob/main/docs/WHY.md" target="_blank" rel="noopener noreferrer">Read the evidence & limitations <span aria-hidden="true">↗</span></a></div><div class="how"><h2>Less mystery. More making.</h2><details><summary>How does it work?</summary><p>An edge-aware filter smooths similar neighbouring colours. Tone quantization simplifies shading, then a Sobel edge map adds outlines. A background worker keeps the controls responsive. Every image is processed locally.</p></details><details><summary>What do the live numbers mean?</summary><p>Processing is the filter's elapsed time on your device, excluding decode and export. Image darkness is mean pixel darkness, not printer toner usage. Compare styles to see how your image changes. The upload count describes this editor's image workflow; your host still receives ordinary page requests.</p></details><details><summary>What has actually been tested?</summary><p id="evaluation-summary">Controlled synthetic fixtures test texture suppression and boundary retention against simple posterization. They measure engineering behaviour, not whether people prefer the artwork. The full plan and reproducible results are in the repository.</p><a href="https://github.com/brej-29/toonforge-mobile-ai/blob/main/docs/EVALUATION.md" target="_blank" rel="noopener noreferrer">Inspect the evaluation ↗</a></details><details><summary>What stays on my device?</summary><p>Your selected photo, processed pixels, and exports stay in browser memory. There is no photo server, analytics, or account. Clearing removes the active photo from the editor; downloaded files remain on your device. The app caches its public assets for offline use after the first visit.</p></details></div></section>
   </main>
-  <footer class="site-footer"><span class="footer-brand">toonforge</span><span>A small studio for everyday stories.</span><a href="https://github.com/brej-29/toonforge-mobile-ai" target="_blank" rel="noopener noreferrer">Free & open source ↗</a></footer>
+  <footer class="site-footer"><span class="footer-brand">toonforge</span><span>A small studio for everyday stories.</span><button id="motion-toggle" class="text-button" aria-pressed="false">Pause background motion</button><a href="https://github.com/brej-29/toonforge-mobile-ai" target="_blank" rel="noopener noreferrer">Free & open source ↗</a></footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
   <section id="print-sheet"><h2 id="print-title">Made in Toonforge</h2><div id="print-image-slot"></div><p>Made locally with Toonforge · toonforge-mobile-ai</p></section>
