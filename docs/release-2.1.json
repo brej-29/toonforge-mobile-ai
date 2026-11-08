@@ -1,0 +1,21 @@
+{
+  "applicationCommit": "f25933b394ea0fafcde79328b071c15fa7fe1e01",
+  "pullRequest": "https://github.com/brej-29/toonforge-mobile-ai/pull/4",
+  "workflow": "https://github.com/brej-29/toonforge-mobile-ai/actions/runs/42509036358",
+  "url": "https://brej-29.github.io/toonforge-mobile-ai/",
+  "conclusion": "success",
+  "jobs": [
+    {"name":"verify","conclusion":"success","completedAt":"2026-11-08T18:16:04Z"},
+    {"name":"deploy","conclusion":"success","completedAt":"2026-11-08T18:16:17Z"},
+    {"name":"smoke","conclusion":"success","completedAt":"2026-11-08T18:16:59Z"}
+  ],
+  "coreTests": 16,
+  "browserTests": 11,
+  "automatedAaWidths": [390,768,1440],
+  "publicSmoke": {"png":"manarola-sample-mono-ink.png","dimensions":[1100,733],"browserDecode":true,"analysis":true,"localPlan":true,"discoveryAssets":true,"canonical":true},
+  "repositoryTopics": 20,
+  "realPaidProviderTested": false,
+  "searchConsoleSubmitted": false,
+  "currentLighthouseMeasured": false,
+  "limitations": ["Synthetic evaluation only; no user study or real-photo quality benchmark.","Source analysis and decode/export excluded from engine timings.","No trained neural image model included.","Automated AA checks do not establish complete accessibility compliance."]
+}

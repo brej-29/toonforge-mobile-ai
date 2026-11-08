@@ -1,6 +1,6 @@
 # Toonforge 2.1 release evidence
 
-Date: 2026-11-08. Deployment of this change is pending at the time of this local evidence snapshot; the final public release result is appended after CI completes. The prior production release remains described in QUALITY.md.
+Date: 2026-11-08. Published and publicly verified. The prior production release remains described in QUALITY.md.
 
 ## Local validation
 
@@ -27,3 +27,15 @@ No current Lighthouse or field-performance score is claimed. Earlier 90/100/100/
 ## Independent review
 
 Initial review found one material issue: an old provider reply could replace a newer local proposal. The fix cancels and invalidates requests when newer intent takes ownership and checks controller identity in success, error and cleanup callbacks. The gated delayed-response regression passes. The reviewer scored this sole fix **resolved**, with disposition **ship** at that fix's scope; refreshed captures remain valid. The verdict is not a blanket certification of untested providers or manual accessibility.
+
+## Public release result
+
+Application commit: `f25933b394ea0fafcde79328b071c15fa7fe1e01`, merged through [PR #4](https://github.com/brej-29/toonforge-mobile-ai/pull/4).
+
+[Production workflow 42509036358](https://github.com/brej-29/toonforge-mobile-ai/actions/runs/42509036358) completed successfully at 2026-11-08 18:17 UTC: **verify, deploy and smoke all passed**. The main-branch verify job reran the build, sixteen core/integration checks, the seeded evaluation and eleven browser cases in Linux CI.
+
+The public HTTPS smoke downloaded `manarola-sample-mono-ink.png`, verified its PNG signature and re-imported it through the browser at **1100 × 733**. It also verified populated source analysis, applied a local text plan (outline value 20), and fetched the guide, sitemap, machine-readable index and social image successfully. The canonical URL matched the public deployment. This was an ordinary fresh browser without a model key.
+
+Live: https://brej-29.github.io/toonforge-mobile-ai/
+
+[Machine-readable evidence](release-2.1.json) records the application commit and successful job times. Repository description/homepage and twenty relevant topics were applied and read back. [UI extension documentation](UI_2_1.md) records the finished interface while preserving incumbent design files and their disclosed sidecar drift.

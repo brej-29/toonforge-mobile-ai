@@ -14,6 +14,12 @@ Updated: 2026-11-08. This file is the durable brief for maintaining, explaining,
 
 **Portfolio positioning:** A deployed computer-vision application with a constrained language-model control layer and a local MCP integration. It demonstrates pixel processing, numerical evaluation, responsive product engineering, privacy boundaries and deployment reliability. It is not a trained neural image model or a generative image editor.
 
+## Verified release outcome
+
+The 2.1 application is deployed and usable at the public URL above. [PR #4](https://github.com/brej-29/toonforge-mobile-ai/pull/4) merged application commit `f25933b394ea0fafcde79328b071c15fa7fe1e01`. [Production run 42509036358](https://github.com/brej-29/toonforge-mobile-ai/actions/runs/42509036358) passed verification, deployment and public smoke at 2026-11-08 18:17 UTC. Sixteen core/integration and eleven browser tests pass; the public test decoded a real 1100×733 PNG, applied a local text plan, checked analysis and fetched search assets. Twenty repository topics, the description and website URL were updated and read back. No API key was required for this working public release.
+
+The complete handoff includes CV bullets, two LinkedIn drafts, a demo script, methods, negative findings and a prioritized roadmap. [The UI extension record](docs/UI_2_1.md) accompanies the preserved original design system. Owner follow-ups are actual-provider/key/CORS verification and Search Console property/sitemap submission; rankings, adoption and learned-model performance are not claimed.
+
 ## What we are trying to do
 
 Build a useful repeatable photo-to-print workflow instead of a one-visit filter demo. Teachers can prepare illustrated handouts; creators can make zine/comic artwork; individuals can print memories. These are intended audiences, not validated customers. No adoption, retention or customer interview evidence is claimed.
